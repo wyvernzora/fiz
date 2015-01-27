@@ -1,4 +1,6 @@
-cc=gcc
+# Makefile for fiz
+
+CC=gcc
 
 CFLAGS= -g
 LEX=flex
@@ -14,7 +16,7 @@ y.tab.o: fiz.y
 	$(YACC) -d fiz.y
 	$(CC) -c y.tab.c
 
-calc: y.tab.o lex.yy.o
+fiz: y.tab.o lex.yy.o
 	$(CC) -o fiz lex.yy.o y.tab.o -lfl
 
 clean:
