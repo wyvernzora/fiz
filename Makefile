@@ -5,6 +5,7 @@ CC=gcc
 CFLAGS= -g
 LEX=flex
 YACC=yacc
+LFL=-lfl
 
 all: fiz
 
@@ -17,8 +18,7 @@ y.tab.o: fiz.y
 	$(CC) -c y.tab.c
 
 fiz: y.tab.o lex.yy.o
-	$(CC) -o fiz lex.yy.o y.tab.o -lfl
+	$(CC) -o fiz lex.yy.o y.tab.o $(LFL)
 
 clean:
 	rm -f lex.yy.c y.tab.c y.tab.h fiz *.o
-
