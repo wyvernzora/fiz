@@ -24,6 +24,8 @@
 %%
 "inc" { return INC; }
 
+"dec" { return DEC; }
+
 "(" { return OPENPAR; }
 
 ")" { return CLOSEPAR; }

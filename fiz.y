@@ -9,16 +9,16 @@
 
 /********************************************************************************
  * Beginning of Section 1: Definition of tokens and non-terminal in the grammar *
- ********************************************************************************/ 
+ ********************************************************************************/
 
 // Tokens are defined here.
 // The lexical analyzer, specified in fiz.l, will read input and generate a stream of tokens
 // More tokens need to be added
-%token <number_val> NUMBER 
-%token INC OPENPAR CLOSEPAR
+%token <number_val> NUMBER
+%token INC DEC OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
-%type <node_val> expr 
+%type <node_val> expr
 
 %union	{
 		char   *string_val;				// Needed when identifier is used
@@ -30,7 +30,7 @@
 /********************************************************************************
  * Beginning of Section 2: C data type and global variable definitions to be    *
  *  included in the generated y.tab.c file                                      *
- ********************************************************************************/ 
+ ********************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +50,8 @@ int yylex();
 enum NODE_TYPE
 {
 	INC_NODE,		// corresponds to (inc exp)
-	NUMBER_NODE,	
+  DEC_NODE,   // corresponds to (dec exp)
+	NUMBER_NODE,
 };
 
 // Below is the data type for a node in the syntax tree
@@ -65,7 +66,7 @@ struct TREE_NODE
 };
 
 // Information we maintain for each defined function
-struct FUNC_DECL	
+struct FUNC_DECL
 {
 	char *name;				// Function name
 						    // Other information needs to be added
@@ -90,10 +91,10 @@ int eval(struct TREE_NODE * node, int *env);
 /********************************************************************************
  * Beginning of Section 3: Grammar production rule definitions and associated   *
  *  C code                                                                      *
- ********************************************************************************/ 
+ ********************************************************************************/
 
 statements:
- statement 
+ statement
 |
  statement statements
 ;
@@ -104,23 +105,28 @@ statement:
 	err_value = 0;
 	resolve($1, NULL);
 	if (err_value == 0) {
-		printf ("%d\n", eval($1, NULL)); 
+		printf ("%d\n", eval($1, NULL));
 	}
 	prompt();
   }
 ;
 
-expr: 
-  OPENPAR INC expr CLOSEPAR
-    {   
+expr:
+  OPENPAR INC expr CLOSEPAR {
 		struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
 		node -> type = INC_NODE;
 		node -> first_arg = $3;
-		$$ = node;    
+		$$ = node;
 	}
 |
-  NUMBER
-  {
+  OPENPAR DEC expr CLOSEPAR {
+    struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
+    node -> type = DEC_NODE;
+    node -> first_arg = $3;
+    $$ = node;
+  }
+|
+  NUMBER {
 		struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
 		node -> type = NUMBER_NODE;
 		node -> intValue = $1;
@@ -131,7 +137,7 @@ expr:
 %%
 /********************************************************************************
  * Beginning of Section 4: C functions to be included in the y.tab.c.           *
- ********************************************************************************/ 
+ ********************************************************************************/
 
 struct FUNC_DECL * find_function(char *name)
 {
@@ -150,6 +156,9 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf)
 		case INC_NODE:
 			resolve(node->first_arg, cf);
 			return;
+    case DEC_NODE:
+      resolve(node->first_arg, cf);
+      return;
 	}
 	return;
 }
@@ -165,7 +174,16 @@ int eval(struct TREE_NODE * node, int *env)
 
 		case INC_NODE:
 			return eval(node->first_arg, env) + 1;
-			
+
+    case DEC_NODE:
+      {
+        int num = eval(node->first_arg, env);
+        if (num == 0) {
+          printf("Attempt to (dec 0).");
+          exit(1);
+        }
+        return num - 1;
+      }
 	}
 	printf("Unexpected node type during evaluation.\n");
 	exit(1);
