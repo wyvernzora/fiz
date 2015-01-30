@@ -7,6 +7,16 @@ LEX=flex
 YACC=yacc
 LFL=-lfl
 
+# OS detection, since -ldl on OS X is -ll
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	LFL = -ldl
+endif
+ifeq ($(UNAME_S),Darwin)
+	LFL = -ll
+endif
+
+
 all: fiz
 
 lex.yy.o: fiz.l y.tab.h
