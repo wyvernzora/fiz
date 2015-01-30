@@ -23,6 +23,7 @@
 %type <node_val> arglist
 %type <node_val> identifier
 %type <node_val> identifiers
+%type <node_val> funcname
 
 %union  {
     char   *string_val;        // Needed when identifier is used
@@ -60,6 +61,7 @@ enum NODE_TYPE {
   ARG_NODE,    // corresponds to arg list of (define ...)
   IDS_NODE,    // corresponds to an identifier array
   ID_NODE,     // corresponds to an identifier
+  FUNC_NODE,   // corresponds to a function name
   NUMBER_NODE,
 };
 
@@ -113,6 +115,15 @@ identifier:
   }
 ;
 
+funcname:
+  IDENTIFIER {
+    struct TREE_NODE * argn = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    argn -> type = FUNC_NODE;
+    argn -> strValue = strdup($1);
+    $$ = argn;
+  }
+;
+
 identifiers:
   identifier {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
@@ -123,7 +134,7 @@ identifiers:
   }
 |
   identifier identifiers {
-    if ($2 -> arg_num >= MAX_ARGUMENTS + 1) {
+    if ($2 -> arg_num >= MAX_ARGUMENTS) {
       fprintf(stderr, "Number of arguments exceeds 10.\n");
       exit(1);
     }
@@ -134,17 +145,25 @@ identifiers:
 ;
 
 arglist:
-  OPENPAR identifiers CLOSEPAR {
+  OPENPAR funcname identifiers CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = ARG_NODE;
     node -> args[0] = $2;
+    node -> args[0] = $3;
 
     // We need to reverse the array here
-    for (int i = 0; i < ($2 -> arg_num / 2); i++) {
-      void* tmp = $2 -> args[1 + i];
-      $2 -> args[1 + i] = $2 -> args[$2 -> arg_num - i];
-      $2 -> args[$2 -> arg_num - i] = tmp;
+    for (int i = 0; i < ($3 -> arg_num / 2); i++) {
+      void* tmp = $3 -> args[1 + i];
+      $3 -> args[1 + i] = $3 -> args[$3 -> arg_num - i];
+      $3 -> args[$3 -> arg_num - i] = tmp;
     }
+
+    // Debug
+    printf("func = %s; args = [", $2 -> strValue);
+    for (int i = 1; i <= $3 -> arg_num; i++) {
+      printf("%s ", $3 -> args[i] -> strValue);
+    }
+    printf("]\n");
 
     $$ = node;
   }
@@ -242,6 +261,7 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf) {
       exit(1);
     case NUMBER_NODE:
     case HALT_NODE:
+    case ID_NODE:
       return;
 
   }
@@ -286,6 +306,11 @@ int eval(struct TREE_NODE * node, int *env) {
 
     case DEF_NODE: {
       fprintf(stderr, "DEF node cannot yet be eval()ed!");
+      exit(1);
+    }
+
+    case ID_NODE: {
+      printf("ID node value can not yet be retrieved\n");
       exit(1);
     }
   }
