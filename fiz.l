@@ -26,6 +26,10 @@
 
 "dec" { return DEC; }
 
+"ifz" { return IFZ; }
+
+"halt" { return HALT; }
+
 "(" { return OPENPAR; }
 
 ")" { return CLOSEPAR; }

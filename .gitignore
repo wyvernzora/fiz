@@ -1,6 +1,7 @@
-*
-!*.*
+fiz
+!fiz.*
 !Makefile
 *.c
 *.h
 *.o
+node_modules

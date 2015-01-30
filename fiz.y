@@ -15,15 +15,15 @@
 // The lexical analyzer, specified in fiz.l, will read input and generate a stream of tokens
 // More tokens need to be added
 %token <number_val> NUMBER
-%token INC DEC OPENPAR CLOSEPAR
+%token INC DEC IFZ HALT OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
 
-%union	{
-		char   *string_val;				// Needed when identifier is used
-		int		number_val;
-		struct TREE_NODE *node_val;
+%union  {
+    char   *string_val;        // Needed when identifier is used
+    int    number_val;
+    struct TREE_NODE *node_val;
 }
 
 %{
@@ -47,29 +47,28 @@ int yylex();
 
 
 // Allowed node types in the syntax tree; more need to be added for the full language
-enum NODE_TYPE
-{
-	INC_NODE,		// corresponds to (inc exp)
-  DEC_NODE,   // corresponds to (dec exp)
-	NUMBER_NODE,
+enum NODE_TYPE {
+  INC_NODE,    // corresponds to (inc exp)
+  DEC_NODE,    // corresponds to (dec exp)
+  IFZ_NODE,    // corresponds to (ifz exp exp exp)
+  HALT_NODE,   // corresponds to (halt)
+  NUMBER_NODE,
 };
 
 // Below is the data type for a node in the syntax tree
-struct TREE_NODE
-{
-	enum NODE_TYPE type;
-	union {
-		struct TREE_NODE *first_arg;		// For INC_NODE and DEC_NODE
-		int    intValue;					// For NUMBER_NODE
-		// Other node types need to be added
-	};
+struct TREE_NODE {
+  enum NODE_TYPE type;
+  union {
+    struct TREE_NODE *args[MAX_ARGUMENTS]; // All arguments
+    int    intValue;                       // For NUMBER_NODE
+    // Other node types need to be added
+  };
 };
 
 // Information we maintain for each defined function
-struct FUNC_DECL
-{
-	char *name;				// Function name
-						    // Other information needs to be added
+struct FUNC_DECL {
+  char *name;        // Function name
+                // Other information needs to be added
 };
 
 struct FUNC_DECL functions[MAX_FUNCTIONS];
@@ -93,44 +92,56 @@ int eval(struct TREE_NODE * node, int *env);
  *  C code                                                                      *
  ********************************************************************************/
 
-statements:
- statement
-|
- statement statements
-;
+statements: statement | statement statements;
 
 statement:
-  expr
-  {
-	err_value = 0;
-	resolve($1, NULL);
-	if (err_value == 0) {
-		printf ("%d\n", eval($1, NULL));
-	}
-	prompt();
+  expr {
+    err_value = 0;
+    resolve($1, NULL);
+
+    if (err_value == 0) {
+      printf ("%d\n", eval($1, NULL));
+    }
+
+    prompt();
   }
 ;
 
 expr:
   OPENPAR INC expr CLOSEPAR {
-		struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
-		node -> type = INC_NODE;
-		node -> first_arg = $3;
-		$$ = node;
-	}
+    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    node -> type = INC_NODE;
+    node -> args[0] = $3;
+    $$ = node;
+  }
 |
   OPENPAR DEC expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
     node -> type = DEC_NODE;
-    node -> first_arg = $3;
+    node -> args[0] = $3;
+    $$ = node;
+  }
+|
+  OPENPAR IFZ expr expr expr CLOSEPAR {
+    struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
+    node -> type = IFZ_NODE;
+    node -> args[0] = $3;
+    node -> args[1] = $4;
+    node -> args[2] = $5;
+    $$ = node;
+  }
+|
+  OPENPAR HALT CLOSEPAR {
+    struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
+    node -> type = HALT_NODE;
     $$ = node;
   }
 |
   NUMBER {
-		struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
-		node -> type = NUMBER_NODE;
-		node -> intValue = $1;
-		$$ = node;
+    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    node -> type = NUMBER_NODE;
+    node -> intValue = $1;
+    $$ = node;
   }
 ;
 
@@ -142,67 +153,91 @@ expr:
 struct FUNC_DECL * find_function(char *name)
 {
     int i;
-	for (i=0; i<numFuncs; i++) {
-		if (! strcmp(functions[i].name, name))
-			return &functions[i];
-	}
-	return NULL;
+  for (i=0; i<numFuncs; i++) {
+    if (! strcmp(functions[i].name, name))
+      return &functions[i];
+  }
+  return NULL;
 }
 
 void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf)
 {
-	switch(node->type)
-	{
-		case INC_NODE:
-			resolve(node->first_arg, cf);
-			return;
-    case DEC_NODE:
-      resolve(node->first_arg, cf);
+  switch(node->type)
+  {
+    case INC_NODE:
+      resolve(node->args[0], cf);
       return;
-	}
-	return;
+    case DEC_NODE:
+      resolve(node->args[0], cf);
+      return;
+    case IFZ_NODE:
+      resolve(node->args[0], cf);
+      resolve(node->args[1], cf);
+      resolve(node->args[2], cf);
+      return;
+    case NUMBER_NODE:
+    case HALT_NODE:
+      return;
+
+  }
+  return;
 }
 
 //Evaluates an expression node
 int eval(struct TREE_NODE * node, int *env)
 {
 
-	switch(node->type)
-	{
-		case NUMBER_NODE:
-			return node->intValue;
+  switch(node->type)
+  {
+    case NUMBER_NODE: {
+      return node->intValue;
+    }
 
-		case INC_NODE:
-			return eval(node->first_arg, env) + 1;
+    case INC_NODE: {
+      return eval(node->args[0], env) + 1;
+    }
 
-    case DEC_NODE:
-      {
-        int num = eval(node->first_arg, env);
+    case DEC_NODE: {
+        int num = eval(node->args[0], env);
         if (num == 0) {
-          printf("Attempt to (dec 0).");
+          fprintf(stderr, "Attempt to (dec 0).");
           exit(1);
         }
         return num - 1;
       }
-	}
-	printf("Unexpected node type during evaluation.\n");
-	exit(1);
+
+    case IFZ_NODE: {
+      int cond = eval(node -> args[0], env);
+      if (!cond) {
+        return eval(node -> args[1], env);
+      } else {
+        return eval(node -> args[2], env);
+      }
+    }
+
+    case HALT_NODE: {
+      fprintf(stderr, "Halted.");
+      exit(1);
+    }
+  }
+  fprintf(stderr, "Unexpected node type during evaluation.\n");
+  exit(1);
 }
 
 
 void yyerror(const char * s)
 {
-	fprintf(stderr,"%s", s);
+  fprintf(stderr,"%s", s);
 }
 
 void prompt()
 {
-    printf("fiz> ");
+  printf("fiz> ");
 }
 
-main()
+int main()
 {
-    prompt();
-    yyparse();
-    return 0;
+  prompt();
+  yyparse();
+  return 0;
 }
