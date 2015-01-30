@@ -50,6 +50,8 @@ int yylex();
 // Maximum number of arguments a function can have
 #define MAX_ARGUMENTS 10
 
+// Verbose mode switch
+int verbose = 0;
 
 // Allowed node types in the syntax tree; more need to be added for the full language
 enum NODE_TYPE {
@@ -158,12 +160,14 @@ arglist:
       $3 -> args[$3 -> arg_num - i] = tmp;
     }
 
-    // Debug
-    printf("func = %s; args = [", $2 -> strValue);
-    for (int i = 1; i <= $3 -> arg_num; i++) {
-      printf("%s ", $3 -> args[i] -> strValue);
+    // Output for testing
+    if (verbose) {
+      printf("func = %s; args = [", $2 -> strValue);
+      for (int i = 1; i <= $3 -> arg_num; i++) {
+        printf("%s ", $3 -> args[i] -> strValue);
+      }
+      printf("]\n");
     }
-    printf("]\n");
 
     $$ = node;
   }
@@ -324,10 +328,16 @@ void yyerror(const char * s) {
 }
 
 void prompt() {
-  printf("fiz> ");
+  if (!verbose) { printf("fiz> "); }
 }
 
-int main() {
+
+int main(int argc, char *argv[]) {
+
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-v") == 0) { verbose = 1; }
+  }
+
   prompt();
   yyparse();
   return 0;
