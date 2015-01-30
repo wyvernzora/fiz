@@ -64,6 +64,7 @@ enum NODE_TYPE {
   IDS_NODE,    // corresponds to an identifier array
   ID_NODE,     // corresponds to an identifier
   FUNC_NODE,   // corresponds to a function name
+  VAR_NODE,    // corresponds to a variable name
   NUMBER_NODE,
 };
 
@@ -224,6 +225,14 @@ expr:
     $$ = node;
   }
 |
+  // Variables
+  IDENTIFIER {
+    struct TREE_NODE * argn = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    argn -> type = VAR_NODE;
+    argn -> strValue = strdup($1);
+    $$ = argn;
+  }
+|
   NUMBER {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = NUMBER_NODE;
@@ -261,13 +270,15 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf) {
       resolve(node->args[2], cf);
       return;
     case DEF_NODE:
-      fprintf(stderr, "DEF node not implemented.\n");
-      exit(1);
+      resolve(node->args[1], cf);
+      return;
+    case ID_NODE:
     case NUMBER_NODE:
     case HALT_NODE:
-    case ID_NODE:
+    case FUNC_NODE:
+    case IDS_NODE:
+    case ARG_NODE:
       return;
-
   }
   return;
 }
@@ -315,6 +326,12 @@ int eval(struct TREE_NODE * node, int *env) {
 
     case ID_NODE: {
       printf("ID node value can not yet be retrieved\n");
+      exit(1);
+    }
+
+    case VAR_NODE: {
+      printf("eval(VAR) -> %s\n", node->strValue);
+      printf("VAR node value can not yet be retrieved\n");
       exit(1);
     }
   }
