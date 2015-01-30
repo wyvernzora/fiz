@@ -17,7 +17,9 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 
-all: fiz
+all: fiz cleantmp
+
+keeptmp: fiz
 
 lex.yy.o: fiz.l y.tab.h
 	$(LEX) fiz.l
@@ -30,5 +32,8 @@ y.tab.o: fiz.y
 fiz: y.tab.o lex.yy.o
 	$(CC) -o fiz lex.yy.o y.tab.o $(LFL)
 
-clean:
-	rm -f lex.yy.c y.tab.c y.tab.h fiz *.o
+cleantmp:
+	rm -f lex.yy.c y.tab.c y.tab.h *.o
+
+clean: cleantmp
+	rm -f fiz
