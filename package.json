@@ -4,7 +4,7 @@
   "description": "CS252 lab02...seems like a weird place for Node.js scaffloding, isn't it?",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "make clean && make && mocha"
   },
   "repository": {
     "type": "git",

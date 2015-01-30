@@ -15,10 +15,14 @@
 // The lexical analyzer, specified in fiz.l, will read input and generate a stream of tokens
 // More tokens need to be added
 %token <number_val> NUMBER
-%token INC DEC IFZ HALT DEFINE IDENTIFIER OPENPAR CLOSEPAR
+%token <string_val> IDENTIFIER
+%token INC DEC IFZ HALT DEFINE OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
+%type <node_val> arglist
+%type <node_val> identifier
+%type <node_val> identifiers
 
 %union  {
     char   *string_val;        // Needed when identifier is used
@@ -53,6 +57,9 @@ enum NODE_TYPE {
   IFZ_NODE,    // corresponds to (ifz exp exp exp)
   HALT_NODE,   // corresponds to (halt)
   DEF_NODE,    // corresponds to (define ...)
+  ARG_NODE,    // corresponds to arg list of (define ...)
+  IDS_NODE,    // corresponds to an identifier array
+  ID_NODE,     // corresponds to an identifier
   NUMBER_NODE,
 };
 
@@ -60,7 +67,9 @@ enum NODE_TYPE {
 struct TREE_NODE {
   enum NODE_TYPE type;
   union {
-    struct TREE_NODE *args[MAX_ARGUMENTS]; // All arguments
+    struct TREE_NODE *args[MAX_ARGUMENTS + 2]; // All arguments
+    char*  strValue;                       // For ID_NODE
+    int    arg_num;                        // Number of args
     int    intValue;                       // For NUMBER_NODE
     // Other node types need to be added
   };
@@ -95,9 +104,51 @@ int eval(struct TREE_NODE * node, int *env);
 
 statements: statement | statement statements;
 
-identifiers: IDENTIFIER | IDENTIFIER identifiers;
+identifier:
+  IDENTIFIER {
+    struct TREE_NODE * argn = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    argn -> type = ID_NODE;
+    argn -> strValue = strdup($1);
+    $$ = argn;
+  }
+;
 
-arglist: OPENPAR identifiers CLOSEPAR
+identifiers:
+  identifier {
+    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    node -> type = IDS_NODE;
+    node -> args[1] = $1;
+    node -> arg_num = 1;
+    $$ = node;
+  }
+|
+  identifier identifiers {
+    if ($2 -> arg_num >= MAX_ARGUMENTS + 1) {
+      fprintf(stderr, "Number of arguments exceeds 10.\n");
+      exit(1);
+    }
+    $2 -> args[$2 -> arg_num + 1] = $1;
+    $2 -> arg_num++;
+    $$ = $2;
+  }
+;
+
+arglist:
+  OPENPAR identifiers CLOSEPAR {
+    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    node -> type = ARG_NODE;
+    node -> args[0] = $2;
+
+    // We need to reverse the array here
+    for (int i = 0; i < ($2 -> arg_num / 2); i++) {
+      void* tmp = $2 -> args[1 + i];
+      $2 -> args[1 + i] = $2 -> args[$2 -> arg_num - i];
+      $2 -> args[$2 -> arg_num - i] = tmp;
+    }
+
+    $$ = node;
+  }
+;
 
 statement:
   expr {
@@ -116,7 +167,8 @@ expr:
   OPENPAR DEFINE arglist expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = DEF_NODE;
-    // TODO
+    node -> args[0] = $3;
+    node -> args[1] = $4;
     $$ = node;
   }
 |
@@ -186,7 +238,7 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf) {
       resolve(node->args[2], cf);
       return;
     case DEF_NODE:
-      fprintf(stderr, "DEF node not implemented");
+      fprintf(stderr, "DEF node not implemented.\n");
       exit(1);
     case NUMBER_NODE:
     case HALT_NODE:
