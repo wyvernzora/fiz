@@ -30,6 +30,13 @@
 
 "halt" { return HALT; }
 
+"define" { return DEFINE; }
+
+[_a-zA-Z][_a-zA-Z0-9]* {
+  yylval.string_val = strdup(yytext);
+  return IDENTIFIER;
+}
+
 "(" { return OPENPAR; }
 
 ")" { return CLOSEPAR; }

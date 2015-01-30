@@ -15,7 +15,7 @@
 // The lexical analyzer, specified in fiz.l, will read input and generate a stream of tokens
 // More tokens need to be added
 %token <number_val> NUMBER
-%token INC DEC IFZ HALT OPENPAR CLOSEPAR
+%token INC DEC IFZ HALT DEFINE IDENTIFIER OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
@@ -52,6 +52,7 @@ enum NODE_TYPE {
   DEC_NODE,    // corresponds to (dec exp)
   IFZ_NODE,    // corresponds to (ifz exp exp exp)
   HALT_NODE,   // corresponds to (halt)
+  DEF_NODE,    // corresponds to (define ...)
   NUMBER_NODE,
 };
 
@@ -94,6 +95,10 @@ int eval(struct TREE_NODE * node, int *env);
 
 statements: statement | statement statements;
 
+identifiers: IDENTIFIER | IDENTIFIER identifiers;
+
+arglist: OPENPAR identifiers CLOSEPAR
+
 statement:
   expr {
     err_value = 0;
@@ -108,6 +113,13 @@ statement:
 ;
 
 expr:
+  OPENPAR DEFINE arglist expr CLOSEPAR {
+    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
+    node -> type = DEF_NODE;
+    // TODO
+    $$ = node;
+  }
+|
   OPENPAR INC expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = INC_NODE;
@@ -150,8 +162,7 @@ expr:
  * Beginning of Section 4: C functions to be included in the y.tab.c.           *
  ********************************************************************************/
 
-struct FUNC_DECL * find_function(char *name)
-{
+struct FUNC_DECL * find_function(char *name) {
     int i;
   for (i=0; i<numFuncs; i++) {
     if (! strcmp(functions[i].name, name))
@@ -160,8 +171,7 @@ struct FUNC_DECL * find_function(char *name)
   return NULL;
 }
 
-void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf)
-{
+void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf) {
   switch(node->type)
   {
     case INC_NODE:
@@ -175,6 +185,9 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf)
       resolve(node->args[1], cf);
       resolve(node->args[2], cf);
       return;
+    case DEF_NODE:
+      fprintf(stderr, "DEF node not implemented");
+      exit(1);
     case NUMBER_NODE:
     case HALT_NODE:
       return;
@@ -184,8 +197,7 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf)
 }
 
 //Evaluates an expression node
-int eval(struct TREE_NODE * node, int *env)
-{
+int eval(struct TREE_NODE * node, int *env) {
 
   switch(node->type)
   {
@@ -219,24 +231,26 @@ int eval(struct TREE_NODE * node, int *env)
       fprintf(stderr, "Halted.");
       exit(1);
     }
+
+    case DEF_NODE: {
+      fprintf(stderr, "DEF node cannot yet be eval()ed!");
+      exit(1);
+    }
   }
   fprintf(stderr, "Unexpected node type during evaluation.\n");
   exit(1);
 }
 
 
-void yyerror(const char * s)
-{
+void yyerror(const char * s) {
   fprintf(stderr,"%s", s);
 }
 
-void prompt()
-{
+void prompt() {
   printf("fiz> ");
 }
 
-int main()
-{
+int main() {
   prompt();
   yyparse();
   return 0;
