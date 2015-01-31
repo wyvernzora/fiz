@@ -10,7 +10,7 @@ LFL=-lfl
 # OS detection, since -ldl on OS X is -ll
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	LFL = -ldl
+	LFL = -lfl
 endif
 ifeq ($(UNAME_S),Darwin)
 	LFL = -ll

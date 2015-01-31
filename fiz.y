@@ -20,10 +20,9 @@
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
-%type <node_val> arglist
 %type <node_val> identifier
 %type <node_val> identifiers
-%type <node_val> funcname
+//%type <node_val> fcall
 
 %union  {
     char   *string_val;        // Needed when identifier is used
@@ -60,10 +59,9 @@ enum NODE_TYPE {
   IFZ_NODE,    // corresponds to (ifz exp exp exp)
   HALT_NODE,   // corresponds to (halt)
   DEF_NODE,    // corresponds to (define ...)
-  ARG_NODE,    // corresponds to arg list of (define ...)
   IDS_NODE,    // corresponds to an identifier array
   ID_NODE,     // corresponds to an identifier
-  FUNC_NODE,   // corresponds to a function name
+  FCALL_NODE,  // corresponds to a function call
   VAR_NODE,    // corresponds to a variable name
   NUMBER_NODE,
 };
@@ -76,14 +74,15 @@ struct TREE_NODE {
     char*  strValue;                       // For ID_NODE
     int    arg_num;                        // Number of args
     int    intValue;                       // For NUMBER_NODE
-    // Other node types need to be added
   };
 };
 
 // Information we maintain for each defined function
 struct FUNC_DECL {
   char *name;        // Function name
-                // Other information needs to be added
+  char* args[MAX_ARGUMENTS];
+  int arg_num;
+  struct TREE_NODE* body;
 };
 
 struct FUNC_DECL functions[MAX_FUNCTIONS];
@@ -118,15 +117,6 @@ identifier:
   }
 ;
 
-funcname:
-  IDENTIFIER {
-    struct TREE_NODE * argn = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
-    argn -> type = FUNC_NODE;
-    argn -> strValue = strdup($1);
-    $$ = argn;
-  }
-;
-
 identifiers:
   identifier {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
@@ -134,47 +124,29 @@ identifiers:
     node -> args[1] = $1;
     node -> arg_num = 1;
     $$ = node;
-  }
-|
-  identifier identifiers {
-    if ($2 -> arg_num >= MAX_ARGUMENTS) {
+  } |
+  identifiers identifier {
+    if ($1 -> arg_num >= MAX_ARGUMENTS) {
       fprintf(stderr, "Number of arguments exceeds 10.\n");
       exit(1);
     }
-    $2 -> args[$2 -> arg_num + 1] = $1;
-    $2 -> arg_num++;
-    $$ = $2;
-  }
-;
-
-arglist:
-  OPENPAR funcname identifiers CLOSEPAR {
-    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
-    node -> type = ARG_NODE;
-    node -> args[0] = $2;
-    node -> args[0] = $3;
-
-    // We need to reverse the array here
-    for (int i = 0; i < ($3 -> arg_num / 2); i++) {
-      void* tmp = $3 -> args[1 + i];
-      $3 -> args[1 + i] = $3 -> args[$3 -> arg_num - i];
-      $3 -> args[$3 -> arg_num - i] = tmp;
-    }
-
-    // Output for testing
-    if (verbose) {
-      printf("func = %s; args = [", $2 -> strValue);
-      for (int i = 1; i <= $3 -> arg_num; i++) {
-        printf("%s ", $3 -> args[i] -> strValue);
-      }
-      printf("]\n");
-    }
-
-    $$ = node;
+    $1 -> args[$1 -> arg_num + 1] = $2;
+    $1 -> arg_num++;
+    $$ = $1;
   }
 ;
 
 statement:
+  OPENPAR DEFINE OPENPAR identifier identifiers CLOSEPAR expr CLOSEPAR {
+
+    printf("func = %s; args = [", $4 -> strValue);
+    for (int i = 1; i <= $5 -> arg_num; i++) {
+      printf("%s ", $5 -> args[i] -> strValue);
+    }
+    printf("]\n");
+
+    prompt();
+  } |
   expr {
     err_value = 0;
     resolve($1, NULL);
@@ -188,28 +160,18 @@ statement:
 ;
 
 expr:
-  OPENPAR DEFINE arglist expr CLOSEPAR {
-    struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
-    node -> type = DEF_NODE;
-    node -> args[0] = $3;
-    node -> args[1] = $4;
-    $$ = node;
-  }
-|
   OPENPAR INC expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = INC_NODE;
     node -> args[0] = $3;
     $$ = node;
-  }
-|
+  } |
   OPENPAR DEC expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
     node -> type = DEC_NODE;
     node -> args[0] = $3;
     $$ = node;
-  }
-|
+  } |
   OPENPAR IFZ expr expr expr CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
     node -> type = IFZ_NODE;
@@ -217,22 +179,18 @@ expr:
     node -> args[1] = $4;
     node -> args[2] = $5;
     $$ = node;
-  }
-|
+  } |
   OPENPAR HALT CLOSEPAR {
     struct TREE_NODE * node = (struct TREE_NODE*) malloc(sizeof(struct TREE_NODE));
     node -> type = HALT_NODE;
     $$ = node;
-  }
-|
-  // Variables
+  } |
   IDENTIFIER {
     struct TREE_NODE * argn = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     argn -> type = VAR_NODE;
     argn -> strValue = strdup($1);
     $$ = argn;
-  }
-|
+  } |
   NUMBER {
     struct TREE_NODE * node = (struct TREE_NODE *) malloc(sizeof(struct TREE_NODE));
     node -> type = NUMBER_NODE;
@@ -275,9 +233,9 @@ void resolve(struct TREE_NODE *node, struct FUNC_DECL *cf) {
     case ID_NODE:
     case NUMBER_NODE:
     case HALT_NODE:
-    case FUNC_NODE:
+    case FCALL_NODE:
     case IDS_NODE:
-    case ARG_NODE:
+    case VAR_NODE:
       return;
   }
   return;
@@ -297,13 +255,13 @@ int eval(struct TREE_NODE * node, int *env) {
     }
 
     case DEC_NODE: {
-        int num = eval(node->args[0], env);
-        if (num == 0) {
-          fprintf(stderr, "Attempt to (dec 0).");
-          exit(1);
-        }
-        return num - 1;
+      int num = eval(node->args[0], env);
+      if (num == 0) {
+        fprintf(stderr, "Attempt to (dec 0).");
+        exit(1);
       }
+      return num - 1;
+    }
 
     case IFZ_NODE: {
       int cond = eval(node -> args[0], env);
@@ -319,24 +277,23 @@ int eval(struct TREE_NODE * node, int *env) {
       exit(1);
     }
 
-    case DEF_NODE: {
-      fprintf(stderr, "DEF node cannot yet be eval()ed!");
-      exit(1);
-    }
-
-    case ID_NODE: {
-      printf("ID node value can not yet be retrieved\n");
-      exit(1);
-    }
-
     case VAR_NODE: {
       printf("eval(VAR) -> %s\n", node->strValue);
       printf("VAR node value can not yet be retrieved\n");
       exit(1);
     }
+
+    case FCALL_NODE: {
+      printf("call(FUNC) -> %s\n", node->strValue);
+      printf("Function calls not implemented yet.\n");
+      exit(1);
+    }
+
+    default: {
+      fprintf(stderr, "Unexpected node type during evaluation.\n");
+      exit(1);
+    }
   }
-  fprintf(stderr, "Unexpected node type during evaluation.\n");
-  exit(1);
 }
 
 
