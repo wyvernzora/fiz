@@ -25,13 +25,16 @@ typedef struct {
 
 // Function table
 Func functions[MAX_FUNCTIONS];
-int numFuncs;
+int  numFuncs;
 
 // Find a function and return it's metadata
 Func * find_function(char *name);
 
+// Define a function
+void def_function(char *name, char *argv[], int argc, AstNode *body);
 
-
+// Call a function
+int call_function(char *name, char *argv[], int argc);
 
 
 
