@@ -1,5 +1,4 @@
 chai = require('chai')
-sinon = require('sinon')
 assert = chai.assert
 should = chai.should()
 expect = chai.expect
