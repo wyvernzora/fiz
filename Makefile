@@ -29,8 +29,20 @@ y.tab.o: fiz.y
 	$(YACC) -d fiz.y
 	$(CC) -c y.tab.c
 
-fiz: y.tab.o lex.yy.o
-	$(CC) -o fiz lex.yy.o y.tab.o $(LFL)
+func.o:
+	$(CC) -c func.c
+
+ast.o:
+	$(CC) -c ast.c
+
+eval.o:
+	$(CC) -c eval.c
+
+resolve.o:
+	$(CC) -c resolve.c
+
+fiz: y.tab.o lex.yy.o func.o ast.o eval.o resolve.o
+	$(CC) -o fiz lex.yy.o y.tab.o func.o ast.o eval.o resolve.o $(LFL)
 
 cleantmp:
 	rm -f lex.yy.c y.tab.c y.tab.h *.o

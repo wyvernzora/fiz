@@ -1,7 +1,8 @@
 fiz
 !fiz.*
 !Makefile
-*.c
-*.h
 *.o
+*.yy.c
+*.tab.h
+*.tab.c
 node_modules
