@@ -49,6 +49,7 @@
 
   // Verbose mode switch
   int verbose = 0;
+  int noprompt = 0;
 
   int err_value = 0;
 %}
@@ -59,36 +60,23 @@
  ********************************************************************************/
 %%
 
-  statements: statement | statement statements;
-
-  identifier:
-    IDENTIFIER {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = ID_NODE;
-      node -> strValue = strdup($1);
-      $$ = node;
-    }
-  ;
-
-  identifiers:
-    identifier {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = LIST_NODE;
-      node -> argv[0] = $1;
-      node -> argc = 1;
-      $$ = node;
-    } |
-    identifiers identifier {
-      if ($1->argc >= MAX_ARGUMENTS) {
-        fprintf(stderr, "Number of arguments exceeds 10.\n");
-        exit(1);
-      }
-      $1 -> argv[$1->argc++] = $2;
-      $$ = $1;
-    }
+  statements:
+    statement | statement statements
   ;
 
   statement:
+    OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
+      Func* fn = (Func*) malloc(sizeof(Func));
+      fn->name = $4 -> strValue;
+      fn->argc = 0;
+      resolve($6, NULL);
+      fn->body = $6;
+      def_function(fn);
+
+      if (verbose) { printf("func = %s; no-args\n", fn->name); }
+
+      prompt();
+    } |
     OPENPAR DEFINE OPENPAR identifier identifiers CLOSEPAR expr CLOSEPAR {
       Func* fn = (Func*) malloc(sizeof(Func));
       fn->name = $4 -> strValue;
@@ -119,6 +107,33 @@
       }
 
       prompt();
+    }
+  ;
+
+  identifier:
+    IDENTIFIER {
+      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      node -> type = ID_NODE;
+      node -> strValue = strdup($1);
+      $$ = node;
+    }
+  ;
+
+  identifiers:
+    identifier {
+      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      node -> type = LIST_NODE;
+      node -> argv[0] = $1;
+      node -> argc = 1;
+      $$ = node;
+    } |
+    identifiers identifier {
+      if ($1->argc >= MAX_ARGUMENTS) {
+        fprintf(stderr, "Number of arguments exceeds 10.\n");
+        exit(1);
+      }
+      $1 -> argv[$1->argc++] = $2;
+      $$ = $1;
     }
   ;
 
@@ -184,13 +199,14 @@ void yyerror(const char * s) {
 }
 
 void prompt() {
-  if (!verbose) { printf("fiz> "); }
+  if (!noprompt) { printf("fiz> "); }
 }
 
 int main(int argc, char *argv[]) {
 
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-v") == 0) { verbose = 1; }
+    if (strcmp(argv[i], "-n") == 0) { noprompt = 1; }
   }
 
   prompt();
