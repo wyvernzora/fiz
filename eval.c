@@ -16,8 +16,7 @@ int eval(struct TREE_NODE * node, int *env) {
     }
 
     case ID_NODE: {
-      printf("get_var(FUNC) -> %s\n", node->strValue);
-      exit(1);
+      return env[node->argc];
     }
 
     default: {

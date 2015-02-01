@@ -33,18 +33,8 @@ void def_function(Func* fn) {
 int call_function(char *name, AstNode *argv[], int argc, int* env) {
 
   // Builtin functions take precedence
-  if (!strcmp(name, "inc")) {
-    return fiz_inc(argv, argc, env);
-  }
-  if (!strcmp(name, "dec")) {
-    return fiz_dec(argv, argc, env);
-  }
-  if (!strcmp(name, "ifz")) {
-    return fiz_ifz(argv, argc, env);
-  }
-  if (!strcmp(name, "halt")) {
-    return fiz_halt(argv, argc, env);
-  }
+  BuiltInFunc bfn = find_builtin_func(name);
+  if (bfn) { return bfn(argv, argc, env); }
 
   // Find the function body
   Func* fn = find_function(name);
@@ -69,6 +59,14 @@ int call_function(char *name, AstNode *argv[], int argc, int* env) {
   int value = eval(fn->body, params);
   free(params);
   return value;
+}
+
+BuiltInFunc find_builtin_func(char *name) {
+  if (!strcmp(name, "inc")) { return &fiz_inc; }
+  if (!strcmp(name, "dec")) { return &fiz_dec; }
+  if (!strcmp(name, "ifz")) { return &fiz_ifz; }
+  if (!strcmp(name, "halt")) { return &fiz_halt; }
+  return NULL;
 }
 
 // BUILTIN FUNCTIONS

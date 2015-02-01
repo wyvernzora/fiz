@@ -100,11 +100,14 @@
         fn->argv[i] = $5->argv[i]->strValue;
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
+      def_function(fn);
+      fn = find_function(fn->name);
+
+      resolve($7, fn);
       fn->body = $7;
 
       if (verbose) { printf("]\n"); }
 
-      def_function(fn);
       prompt();
     } |
     expr {

@@ -100,6 +100,24 @@ describe '(define ...)', ->
     script = '(define (func a1 a2 a3 a4 a5) (inc 0))'
     run script, 'func = func; args = [a1 a2 a3 a4 a5 ]', '', done
 
+  it 'should correctly run a previously defined function', (done) ->
+    script = '''
+    (define (func a1) (inc 998))
+    (func 0)
+    '''
+    run script, 'func = func; args = [a1 ]\n999', '', done
+
+  it 'should panic when refefining an existing function', (done) ->
+    script = '''
+    (define (func a1) (inc 998))
+    (define (func a1 a2) (dec 998))
+    '''
+    run script, null, 'Function \'func\' already defined.', done
+
+  it 'should panic when calling an undefined function', (done) ->
+    script = '(func 0)'
+    run script, null, 'Function \'func\' is undefined.', done
+
   it 'should panic when there are no arguments', (done) ->
     script = '(define (func) (inc 0))'
     run script, null, 'syntax error', done

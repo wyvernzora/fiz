@@ -15,6 +15,9 @@
 // Maximum number of function definitions the interpreter allow
 #define MAX_FUNCTIONS 1000
 
+// Builtin function signature
+typedef int (*BuiltInFunc)(AstNode**, int, int*);
+
 // Function metadata
 typedef struct {
   char *name;                 // Function name
@@ -35,6 +38,9 @@ void def_function(Func* fn);
 
 // Call a function
 int call_function(char *name, AstNode *argv[], int argc, int *env);
+
+// Determines whether a function is a builtin function
+BuiltInFunc find_builtin_func(char *name);
 
 
 // BUILTIN FUNCTIONS
