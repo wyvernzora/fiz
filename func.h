@@ -31,13 +31,17 @@ int  numFuncs;
 Func * find_function(char *name);
 
 // Define a function
-void def_function(char *name, char *argv[], int argc, AstNode *body);
+void def_function(Func* fn);
 
 // Call a function
-int call_function(char *name, char *argv[], int argc);
+int call_function(char *name, AstNode *argv[], int argc, int *env);
 
 
-
+// BUILTIN FUNCTIONS
+int fiz_inc(AstNode* argv[], int argc, int *env);
+int fiz_dec(AstNode* argv[], int argc, int *env);
+int fiz_ifz(AstNode* argv[], int argc, int *env);
+int fiz_halt(AstNode* argv[], int argc, int *env);
 
 
 #endif

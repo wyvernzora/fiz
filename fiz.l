@@ -22,14 +22,6 @@
 %}
 
 %%
-"inc" { return INC; }
-
-"dec" { return DEC; }
-
-"ifz" { return IFZ; }
-
-"halt" { return HALT; }
-
 "define" { return DEFINE; }
 
 [_a-zA-Z][_a-zA-Z0-9]* {

@@ -34,11 +34,11 @@ describe '(inc exp)', ->
 
   it 'should panic when there are no arguments', (done) ->
     script = '(inc)'
-    run script, null, 'syntax error', done
+    run script, null, 'INC expects 1 argument but got 0.', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(inc 0 0)'
-    run script, null, 'syntax error', done
+    run script, null, 'INC expects 1 argument but got 2.', done
 
 describe '(dec exp)', ->
 
@@ -56,33 +56,33 @@ describe '(dec exp)', ->
 
   it 'should panic when there are no arguments', (done) ->
     script = '(dec)'
-    run script, null, 'syntax error', done
+    run script, null, 'DEC expects 1 argument but got 0.', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(dec 1 1)'
-    run script, null, 'syntax error', done
+    run script, null, 'DEC expects 1 argument but got 2.', done
 
 describe '(ifz exp0 exp1 exp2)', ->
 
-  it 'should evaluate to exp1 when exp0 is 0', (done) ->
+  it 'should evaluate to exp1 when exp0 is not 0', (done) ->
     script = '(ifz 0 2 3)'
     run script, '2', null, done
 
-  it 'should evaluate to exp2 when exp0 is not 0', (done) ->
+  it 'should evaluate to exp2 when exp0 is 0', (done) ->
     script = '(ifz 1 2 3)'
     run script, '3', null, done
 
   it 'should panic when there are no arguments', (done) ->
     script = '(ifz)'
-    run script, null, 'syntax error', done
+    run script, null, 'IFZ expects 3 arguments but got 0.', done
 
   it 'should panic when there are too few arguments', (done) ->
     script = '(ifz 1 2)'
-    run script, null, 'syntax error', done
+    run script, null, 'IFZ expects 3 arguments but got 2.', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(ifz 1 2 3 4)'
-    run script, null, 'syntax error', done
+    run script, null, 'IFZ expects 3 arguments but got 4.', done
 
 describe '(halt)', ->
 
@@ -92,7 +92,7 @@ describe '(halt)', ->
 
   it 'should return syntax error when there are arguments', (done) ->
     script = '(halt 0)'
-    run script, null, 'syntax error', done
+    run script, null, 'HALT expects no arguments but got 1.', done
 
 describe '(define ...)', ->
 
@@ -129,12 +129,12 @@ describe 'Test cases in the lab assignment', ->
 
   it '(inc 4 5) should return syntax error', (done) ->
     script = '(inc 4 5)'
-    run script, null, 'syntax error', done
+    run script, null, 'INC expects 1 argument but got 2.', done
 
   it '(ifz 0 halt) should return syntax error', (done) ->
     script = '(ifz 0 halt)'
-    run script, null, 'syntax error', done
+    run script, null, 'IFZ expects 3 arguments but got 2.', done
 
   it '(inc (dec )) should return syntax error', (done) ->
     script = '(inc (dec ))'
-    run script, null, 'syntax error', done
+    run script, null, 'DEC expects 1 argument but got 0.', done

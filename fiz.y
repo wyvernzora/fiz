@@ -16,13 +16,13 @@
 // More tokens need to be added
 %token <number_val> NUMBER
 %token <string_val> IDENTIFIER
-%token INC DEC IFZ HALT DEFINE OPENPAR CLOSEPAR
+%token DEFINE OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
+%type <node_val> exprs
 %type <node_val> identifier
 %type <node_val> identifiers
-//%type <node_val> fcall
 
 %union  {
   int    number_val;
@@ -73,7 +73,7 @@
   identifiers:
     identifier {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = IDS_NODE;
+      node -> type = LIST_NODE;
       node -> argv[0] = $1;
       node -> argc = 1;
       $$ = node;
@@ -90,13 +90,21 @@
 
   statement:
     OPENPAR DEFINE OPENPAR identifier identifiers CLOSEPAR expr CLOSEPAR {
+      Func* fn = (Func*) malloc(sizeof(Func));
+      fn->name = $4 -> strValue;
+      fn->argc = $5 -> argc;
 
-      printf("func = %s; args = [", $4 -> strValue);
-      for (int i = 0; i < $5->argc; i++) {
-        printf("%s ", $5 -> argv[i] -> strValue);
+      if (verbose) { printf("func = %s; args = [", fn->name); }
+
+      for (int i = 0; i < fn->argc; i++) {
+        fn->argv[i] = $5->argv[i]->strValue;
+        if (verbose) { printf("%s ", fn->argv[i]); }
       }
-      printf("]\n");
+      fn->body = $7;
 
+      if (verbose) { printf("]\n"); }
+
+      def_function(fn);
       prompt();
     } |
     expr {
@@ -112,34 +120,28 @@
   ;
 
   expr:
-    OPENPAR INC expr CLOSEPAR {
+    OPENPAR identifier CLOSEPAR {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = INC_NODE;
-      node -> argv[0] = $3;
+      node -> type = FCALL_NODE;
+      node -> argv[0] = $2;
+
+      AstNode *argn = (AstNode*) malloc(sizeof(AstNode));
+      argn -> type = LIST_NODE;
+      argn -> argc = 0;
+
+      node -> argv[1] = argn;
       $$ = node;
     } |
-    OPENPAR DEC expr CLOSEPAR {
+    OPENPAR identifier exprs CLOSEPAR {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = DEC_NODE;
-      node -> argv[0] = $3;
-      $$ = node;
-    } |
-    OPENPAR IFZ expr expr expr CLOSEPAR {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = IFZ_NODE;
-      node -> argv[0] = $3;
-      node -> argv[1] = $4;
-      node -> argv[2] = $5;
-      $$ = node;
-    } |
-    OPENPAR HALT CLOSEPAR {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = HALT_NODE;
+      node -> type = FCALL_NODE;
+      node -> argv[0] = $2;
+      node -> argv[1] = $3;
       $$ = node;
     } |
     IDENTIFIER {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = VAR_NODE;
+      node -> type = ID_NODE;
       node -> strValue = strdup($1);
       $$ = node;
     } |
@@ -148,6 +150,25 @@
       node -> type = NUMBER_NODE;
       node -> intValue = $1;
       $$ = node;
+    }
+  ;
+
+  exprs:
+    expr {
+      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      node -> type = LIST_NODE;
+      node -> argv[0] = $1;
+      node -> argc = 1;
+      $$ = node;
+
+    } |
+    exprs expr {
+      if ($1->argc >= MAX_ARGUMENTS) {
+        fprintf(stderr, "Number of arguments exceeds 10.\n");
+        exit(1);
+      }
+      $1->argv[$1->argc++] = $2;
+      $$ = $1;
     }
   ;
 %%
