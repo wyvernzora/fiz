@@ -248,3 +248,15 @@ describe 'Test cases from the lab assignment', ->
     (inc (add (add 1 2) 3))
     '''
     run '-n', script, '7', null, done
+
+describe 'Regression testing for fixed issues', ->
+
+  # Variables within user-defined function calls within user-defined function definitions are
+  # sometimes incorrectly reported as undefined. An example reproduction of the issue is the
+  # following test case.
+  it 'issue #1: variables within user-defined function definitions are reported as undefined', (done) ->
+    script = '''
+    (define (f0 a) (inc a))
+    (define (f1 b) (f0 (inc b)))
+    '''
+    run '-n', script, '', null, done

@@ -6,16 +6,6 @@ void resolve(AstNode *node, Func *cf) {
   switch(node->type)
   {
     case FCALL_NODE: {
-      // Pass down a list of function parameters
-      char* fname = node->argv[0]->strValue;
-      if (!find_builtin_func(fname)) {
-        Func* fn = find_function(fname);
-        if (!fn) {
-          fprintf(stderr, "Function '%s' is undefined.", fname);
-          exit(1);
-        }
-        cf = fn;
-      }
       // Resolve arguments
       AstNode *args = node -> argv[1];
       for (int i = 0; i < args -> argc; i++) {
