@@ -72,11 +72,14 @@
     } |
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
       Func* fn = (Func*) malloc(sizeof(Func));
-      fn->name = $4 -> strValue;
+      fn->name = strdup($4 -> strValue);
       fn->argc = 0;
       resolve($6, NULL);
       fn->body = $6;
       def_function(fn);
+
+      deleteNode($4);
+      free(fn);
 
       if (verbose) { printf("func = %s; no-args\n", fn->name); }
 
@@ -84,16 +87,21 @@
     } |
     OPENPAR DEFINE OPENPAR identifier identifiers CLOSEPAR expr CLOSEPAR {
       Func* fn = (Func*) malloc(sizeof(Func));
-      fn->name = $4 -> strValue;
+      fn->name = strdup($4 -> strValue);
       fn->argc = $5 -> argc;
 
       if (verbose) { printf("func = %s; args = [", fn->name); }
 
       for (int i = 0; i < fn->argc; i++) {
-        fn->argv[i] = $5->argv[i]->strValue;
+        fn->argv[i] = strdup($5->argv[i]->strValue);
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
       def_function(fn);
+
+      deleteNode($4);
+      deleteNode($5);
+      free(fn);
+
       fn = find_function(fn->name);
 
       resolve($7, fn);
