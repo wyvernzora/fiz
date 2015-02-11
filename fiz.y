@@ -119,7 +119,7 @@
     IDENTIFIER {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
       node -> type = ID_NODE;
-      node -> strValue = strdup($1);
+      node -> strValue = $1;
       $$ = node;
     }
   ;
@@ -162,18 +162,13 @@
       node -> argv[1] = $3;
       $$ = node;
     } |
-    IDENTIFIER {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
-      node -> type = ID_NODE;
-      node -> strValue = strdup($1);
-      $$ = node;
-    } |
     NUMBER {
       AstNode *node = (AstNode*) malloc(sizeof(AstNode));
       node -> type = NUMBER_NODE;
       node -> intValue = $1;
       $$ = node;
-    }
+    } |
+    identifier
   ;
 
   exprs:
