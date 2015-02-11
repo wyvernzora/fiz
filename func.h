@@ -18,9 +18,9 @@ typedef int (*BuiltInFunc)(AstNode**, int, int*);
 // Function metadata
 typedef struct {
   char             *name;                 // Function name
-  char             *argv[MAX_ARGUMENTS];  // Argument name list
-  struct TREE_NODE *body;                 // Body of the function (expr)
   int               argc;                 // Number of arguments
+  char             *argv[MAX_ARGUMENTS];  // Argument name list
+  AstNode          *body;                 // Body of the function (expr)
 } Func;
 
 // Function table
@@ -38,7 +38,6 @@ int call_function(char*, AstNode**, int, int*);
 
 // Determines whether a function is a builtin function
 BuiltInFunc find_builtin_func(char*);
-
 
 // BUILTIN FUNCTIONS
 int fiz_inc(AstNode**, int, int*);

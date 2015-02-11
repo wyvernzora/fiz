@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "func.h"
 #include "eval.h"
+#include "trace.h"
 
 int numFuncs = 0;
 
@@ -20,13 +21,13 @@ Func* find_function(char *name) {
 void def_function(Func* fn) {
 
   if (numFuncs >= MAX_FUNCTIONS) {
-    fprintf(stderr, "Number of defined functions exceeds %d.", MAX_FUNCTIONS);
-    exit(1);
+    PANIC("ERROR: Number of defined functions exceeds %d.\n", MAX_FUNCTIONS);
+    return;
   }
 
   if (find_function(fn->name)) {
-    fprintf(stderr, "Function '%s' already defined.", fn->name);
-    exit(1);
+    PANIC("ERROR: Function '%s' already defined.\n", fn->name);
+    return;
   }
 
   functions[numFuncs++] = *fn;

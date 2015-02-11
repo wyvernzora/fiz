@@ -11,6 +11,6 @@
 #define RESOLVE_H
 
 // Resolve the usage of functions and arguments in an expression
-void resolve(AstNode*, Func*);
+int resolve(AstNode*, Func*);
 
 #endif

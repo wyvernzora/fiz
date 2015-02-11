@@ -20,7 +20,7 @@ int eval(AstNode *node, int *env) {
     }
 
     case ID_NODE: {
-      return env[node->argc];
+      return env[node->index];
     }
 
     default: {

@@ -12,5 +12,6 @@
 
 #endif
 
+  #define PANIC(...) fprintf(stderr, __VA_ARGS__);
 
 #endif

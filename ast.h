@@ -27,6 +27,7 @@ typedef struct TREE_NODE {
 
   NodeType           type;                 // Node type
   int                argc;                 // Number of arguments
+  int                index;                // Function/Variable index
 
   union {
     struct TREE_NODE *argv[MAX_ARGUMENTS]; // All arguments

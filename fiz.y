@@ -104,10 +104,9 @@
       prompt();
     } |
     expr {
-      err_value = 0;
-      resolve($1, NULL);
+      int success = resolve($1, NULL);
 
-      if (err_value == 0) {
+      if (success) {
         printf ("%d\n", eval($1, NULL));
       }
       deleteNode($1);
