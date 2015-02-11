@@ -24,8 +24,6 @@
 %%
 "define" { return DEFINE; }
 
-"exit" { return EXIT; }
-
 [_a-zA-Z][_a-zA-Z0-9]* {
   yylval.string_val = strdup(yytext);
   return IDENTIFIER;

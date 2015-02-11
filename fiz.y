@@ -17,8 +17,8 @@
 %token <number_val> NUMBER
 %token <string_val> IDENTIFIER
 %token DEFINE
-%token EXIT
-%token OPENPAR CLOSEPAR
+%token OPENPAR
+%token CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
@@ -67,9 +67,6 @@
   ;
 
   statement:
-    EXIT {
-      exit(1);
-    } |
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
       Func* fn = (Func*) malloc(sizeof(Func));
       fn->name = strdup($4 -> strValue);
