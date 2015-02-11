@@ -2,7 +2,7 @@
 
 CC=gcc
 
-CFLAGS= -std=c99 -g
+CFLAGS= -std=gnu99 -g
 LEX=flex
 YACC=yacc
 LFL=-lfl
