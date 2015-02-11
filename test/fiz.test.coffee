@@ -10,7 +10,7 @@ target = './fiz'
 
 # Convenience function for testing
 run = (flags, input, output, errmsg, callback) ->
-  exec target + " #{flags} <<< \"#{input}\"", (error, stdout, stderr) ->
+  exec "echo \"#{input}\" | #{target} #{flags}", (error, stdout, stderr) ->
     try
       if output
         expect(stdout.replace(/\S*fiz>\S*/g, '').trim()).to.be.equal(output)

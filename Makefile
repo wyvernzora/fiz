@@ -2,7 +2,7 @@
 
 CC=gcc
 
-CFLAGS= -g
+CFLAGS= -std=c99 -g
 LEX=flex
 YACC=yacc
 LFL=-lfl
@@ -20,17 +20,17 @@ noclean: fiz test
 
 lex.yy.o: fiz.l y.tab.h
 	$(LEX) fiz.l
-	$(CC) -c lex.yy.c
+	$(CC) $(CFLAGS) -c lex.yy.c
 
 y.tab.o: fiz.y
 	$(YACC) -d fiz.y
-	$(CC) -c y.tab.c
+	$(CC) $(CFLAGS) -c y.tab.c
 
 cfiles:
-	$(CC) -c func.c
-	$(CC) -c ast.c
-	$(CC) -c eval.c
-	$(CC) -c resolve.c
+	$(CC) $(CFLAGS) -c func.c
+	$(CC) $(CFLAGS) -c ast.c
+	$(CC) $(CFLAGS) -c eval.c
+	$(CC) $(CFLAGS) -c resolve.c
 
 fiz: y.tab.o lex.yy.o cfiles
 	$(CC) -o fiz lex.yy.o y.tab.o func.o ast.o eval.o resolve.o $(LFL)
