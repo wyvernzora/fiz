@@ -4,9 +4,6 @@
 // Author: Denis Luchkin-Zhou                                                //
 //                                                                           //
 // ========================================================================= //
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "func.h"
 #include "ast.h"
 
@@ -14,6 +11,6 @@
 #define RESOLVE_H
 
 // Resolve the usage of functions and arguments in an expression
-void resolve(AstNode *node, Func *cf);
+void resolve(AstNode*, Func*);
 
 #endif

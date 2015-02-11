@@ -24,6 +24,8 @@
 %%
 "define" { return DEFINE; }
 
+"exit" { return EXIT; }
+
 [_a-zA-Z][_a-zA-Z0-9]* {
   yylval.string_val = strdup(yytext);
   return IDENTIFIER;
@@ -34,7 +36,7 @@
 ")" { return CLOSEPAR; }
 
 0|[1-9][0-9]* {
-	yylval.number_val = atoi(yytext);		// yytext is the string matching the regular expression
+	yylval.number_val = atoi(yytext);
 	return NUMBER;
 }
 

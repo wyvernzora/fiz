@@ -24,15 +24,20 @@ typedef enum {
 
 // Below is the data type for a node in the syntax tree
 typedef struct TREE_NODE {
- NodeType type;
- int argc;
- union {
-   struct TREE_NODE *argv[MAX_ARGUMENTS]; // All arguments
-   char*  strValue;                       // For ID_NODE
-   int    arg_num;                        // Number of args
-   int    intValue;                       // For NUMBER_NODE
- };
+
+  NodeType           type;                 // Node type
+  int                argc;                 // Number of arguments
+
+  union {
+    struct TREE_NODE *argv[MAX_ARGUMENTS]; // All arguments
+    char             *strValue;            // For ID_NODE
+    int               intValue;            // For NUMBER_NODE
+  };
+
 } AstNode;
+
+// Free memory occupied by the AstNode and its children
+void deleteNode(AstNode*);
 
 
 #endif

@@ -16,7 +16,9 @@
 // More tokens need to be added
 %token <number_val> NUMBER
 %token <string_val> IDENTIFIER
-%token DEFINE OPENPAR CLOSEPAR
+%token DEFINE
+%token EXIT
+%token OPENPAR CLOSEPAR
 
 // This defines what value will be returned after parsing an expression
 %type <node_val> expr
@@ -65,6 +67,9 @@
   ;
 
   statement:
+    EXIT {
+      exit(1);
+    } |
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
       Func* fn = (Func*) malloc(sizeof(Func));
       fn->name = $4 -> strValue;
@@ -105,6 +110,7 @@
       if (err_value == 0) {
         printf ("%d\n", eval($1, NULL));
       }
+      deleteNode($1);
 
       prompt();
     }

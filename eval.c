@@ -3,7 +3,7 @@
 #include "eval.h"
 
 //Evaluates an expression node
-int eval(struct TREE_NODE * node, int *env) {
+int eval(AstNode *node, int *env) {
 
   switch(node->type)
   {
@@ -12,7 +12,11 @@ int eval(struct TREE_NODE * node, int *env) {
     }
 
     case FCALL_NODE: {
-      return call_function(node->argv[0]->strValue, node->argv[1]->argv, node->argv[1]->argc, env);
+      char      *name = node->argv[0]->strValue;
+      int        count = node->argv[1]->argc;
+      AstNode  **arguments = node->argv[1]->argv;
+
+      return call_function(name, arguments, count, env);
     }
 
     case ID_NODE: {
