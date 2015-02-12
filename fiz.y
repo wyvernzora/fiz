@@ -95,11 +95,13 @@
       }
       def_function(fn);
 
-      deleteNode($4);
-      deleteNode($5);
-      free(fn);
+      Func* oldFn = fn;
 
       fn = find_function(fn->name);
+
+      deleteNode($4);
+      deleteNode($5);
+      free(oldFn);
 
       resolve($7, fn);
       fn->body = $7;
