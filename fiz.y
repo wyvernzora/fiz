@@ -75,10 +75,10 @@
       fn->body = $6;
       def_function(fn);
 
+      if (verbose) { printf("func = %s; no-args\n", fn->name); }
+
       deleteNode($4);
       free(fn);
-
-      if (verbose) { printf("func = %s; no-args\n", fn->name); }
 
       prompt();
     } |

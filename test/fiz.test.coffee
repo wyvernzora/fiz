@@ -17,7 +17,6 @@ run = (flags, input, output, errmsg, callback) ->
       if errmsg
         expect(stderr).to.contain(errmsg)
       else if errmsg is null
-        expect(error).to.be.null()
         expect(stderr).to.have.length.of(0)
       callback()
     catch err
