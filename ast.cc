@@ -2,44 +2,37 @@
 #include "func.h"
 #include "ast.h"
 
-//AstNode::AstNode(void) { }
-//AstNode::~AstNode(void) {
-
-//}
-
-void deleteNode(AstNode* node) {
-
-  switch (node->type) {
+AstNode::AstNode(NodeType t) {
+  type = t;
+  argc = 0;
+}
+AstNode::~AstNode(void) {
+  switch (type) {
 
     // LEAF: Identifier
     case ID_NODE: {
-      TRACE("del ID_NODE [%s]\n", node->strValue);
-      delete node->strValue; // Delete the identifier name
-      delete node;
+      TRACE("del ID_NODE [%s]\n", strValue);
+      delete strValue; // Delete the identifier name
     }
     break;
 
     // LEAF: Number
     case NUMBER_NODE: {
-      TRACE("del NUMBER_NODE [%d]\n", node->intValue);
-      delete node;
+      TRACE("del NUMBER_NODE [%d]\n", intValue);
     }
     break;
 
     case LIST_NODE: {
-      TRACE("del LIST_NODE [%d]\n", node->argc);
+      TRACE("del LIST_NODE [%d]\n", argc);
       // Delete list contents
-      for (int i = 0; i < node->argc; i++) { deleteNode(node->argv[i]); }
-      delete node;
+      for (int i = 0; i < argc; i++) { delete argv[i]; }
     }
     break;
 
     case FCALL_NODE: {
-
-      TRACE("del FCALL_NODE [%s]\n", node->argv[0]->strValue);
-      deleteNode(node->argv[0]); // Delete function name
-      deleteNode(node->argv[1]); // Delete function arguments
-      delete node; // Delete the node itself
+      TRACE("del FCALL_NODE [%s]\n", argv[0]->strValue);
+      delete argv[0]; // Delete function name
+      delete argv[1]; // Delete function arguments
     }
     break;
   }

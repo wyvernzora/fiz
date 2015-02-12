@@ -2,12 +2,12 @@
 
 // Function table
 int  numFuncs;
-Func functions[MAX_FUNCTIONS];
+Func* functions[MAX_FUNCTIONS + BUILTIN_FUNCTIONS];
 
 #else
 
 // Function table
 extern int  numFuncs;
-extern Func functions[MAX_FUNCTIONS];
+extern Func* functions[MAX_FUNCTIONS + BUILTIN_FUNCTIONS];
 
 #endif

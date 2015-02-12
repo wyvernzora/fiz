@@ -15,7 +15,7 @@ int eval(AstNode *node, int *env) {
       char      *name = node->argv[0]->strValue;
       int        count = node->argv[1]->argc;
       AstNode  **arguments = node->argv[1]->argv;
-
+      
       return call_function(name, arguments, count, env);
     }
 

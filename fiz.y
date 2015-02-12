@@ -70,23 +70,20 @@
 
   statement:
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
-      Func* fn = (Func*) malloc(sizeof(Func));
-      fn->name = strdup($4 -> strValue);
+      Func* fn = new Func($4 -> strValue);
       fn->argc = 0;
       resolve($6, NULL);
       fn->body = $6;
-      def_function(fn);
+      registerFunction(fn);
 
       if (verbose) { printf("func = %s; no-args\n", fn->name); }
 
-      deleteNode($4);
-      free(fn);
+      delete $4;
 
       prompt();
     } |
     OPENPAR DEFINE OPENPAR identifier identifiers CLOSEPAR expr CLOSEPAR {
-      Func* fn = (Func*) malloc(sizeof(Func));
-      fn->name = strdup($4 -> strValue);
+      Func* fn = new Func($4 -> strValue);
       fn->argc = $5 -> argc;
 
       if (verbose) { printf("func = %s; args = [", fn->name); }
@@ -95,15 +92,10 @@
         fn->argv[i] = strdup($5->argv[i]->strValue);
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
-      def_function(fn);
+      registerFunction(fn);
 
-      Func* oldFn = fn;
-
-      fn = find_function(fn->name);
-
-      deleteNode($4);
-      deleteNode($5);
-      free(oldFn);
+      delete $4;
+      delete $5;
 
       resolve($7, fn);
       fn->body = $7;
@@ -118,7 +110,7 @@
       if (success) {
         printf ("%d\n", eval($1, NULL));
       }
-      deleteNode($1);
+      delete $1;
 
       prompt();
     }
@@ -126,8 +118,7 @@
 
   identifier:
     IDENTIFIER {
-      AstNode *node = new AstNode();
-      node -> type = ID_NODE;
+      AstNode *node = new AstNode(ID_NODE);
       node -> strValue = $1;
       $$ = node;
     }
@@ -135,8 +126,7 @@
 
   identifiers:
     identifier {
-      AstNode *node = new AstNode();
-      node -> type = LIST_NODE;
+      AstNode *node = new AstNode(LIST_NODE);
       node -> argv[0] = $1;
       node -> argc = 1;
       $$ = node;
@@ -153,27 +143,23 @@
 
   expr:
     OPENPAR identifier CLOSEPAR {
-      AstNode *node = new AstNode();
-      node -> type = FCALL_NODE;
+      AstNode *node = new AstNode(FCALL_NODE);
       node -> argv[0] = $2;
 
-      AstNode *argn = new AstNode();
-      argn -> type = LIST_NODE;
+      AstNode *argn = new AstNode(LIST_NODE);
       argn -> argc = 0;
 
       node -> argv[1] = argn;
       $$ = node;
     } |
     OPENPAR identifier exprs CLOSEPAR {
-      AstNode *node = new AstNode();
-      node -> type = FCALL_NODE;
+      AstNode *node = new AstNode(FCALL_NODE);
       node -> argv[0] = $2;
       node -> argv[1] = $3;
       $$ = node;
     } |
     NUMBER {
-      AstNode *node = new AstNode();
-      node -> type = NUMBER_NODE;
+      AstNode *node = new AstNode(NUMBER_NODE);
       node -> intValue = $1;
       $$ = node;
     } |
@@ -182,8 +168,7 @@
 
   exprs:
     expr {
-      AstNode *node = new AstNode();
-      node -> type = LIST_NODE;
+      AstNode *node = new AstNode(LIST_NODE);
       node -> argv[0] = $1;
       node -> argc = 1;
       $$ = node;
@@ -213,10 +198,17 @@ void prompt() {
 
 int main(int argc, char *argv[]) {
 
+  // Command line arguments
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-v") == 0) { verbose = 1; }
     if (strcmp(argv[i], "-n") == 0) { noprompt = 1; }
   }
+
+  // Load builtin functions
+  registerFunction(new NativeFunc("inc",  1, &fiz_inc));
+  registerFunction(new NativeFunc("dec",  1, &fiz_dec));
+  registerFunction(new NativeFunc("ifz",  3, &fiz_ifz));
+  registerFunction(new NativeFunc("halt", 0, &fiz_halt));
 
   prompt();
   yyparse();

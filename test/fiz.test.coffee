@@ -15,7 +15,7 @@ run = (flags, input, output, errmsg, callback) ->
       if output
         expect(stdout.replace(/\S*fiz>\S*/g, '').trim()).to.be.equal(output)
       if errmsg
-        expect(stderr).to.contain(errmsg)
+        expect(stderr.toLowerCase()).to.contain(errmsg.toLowerCase())
       else if errmsg is null
         expect(stderr).to.have.length.of(0)
       callback()
@@ -114,7 +114,7 @@ describe '(halt)', ->
 
   it 'should return syntax error when there are arguments', (done) ->
     script = '(halt 0)'
-    run '-n -v', script, null, 'HALT expects no arguments but got 1.', done
+    run '-n -v', script, null, 'HALT expects 0 arguments but got 1.', done
 
 describe '(define ...)', ->
 

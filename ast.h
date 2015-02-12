@@ -37,16 +37,9 @@ public:
     int         intValue;             // For NUMBER_NODE
   };
 
-  //AstNode(void);
-  //~AstNode(void);
-
+  AstNode(NodeType);
+  ~AstNode(void);
+  
 };
-
-extern "C" {
-
-  // Free memory occupied by the AstNode and its children
-  void deleteNode(AstNode*);
-
-}
 
 #endif
