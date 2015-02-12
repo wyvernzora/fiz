@@ -30,11 +30,9 @@ y.tab.o: fiz.y
 cfiles:
 	$(CXX) $(CFLAGS) -c func.cc
 	$(CXX) $(CFLAGS) -c ast.cc
-	$(CXX) $(CFLAGS) -c eval.cc
-	$(CXX) $(CFLAGS) -c resolve.cc
 
 fiz: y.tab.o lex.yy.o cfiles
-	$(CXX) -o fiz lex.yy.o y.tab.o func.o ast.o eval.o resolve.o $(LFL)
+	$(CXX) -o fiz lex.yy.o y.tab.o func.o ast.o $(LFL)
 
 test: fiz
 	-mocha --reporter nyan

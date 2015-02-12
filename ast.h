@@ -14,6 +14,9 @@
 // Maximum number of arguments a function can have
 #define MAX_ARGUMENTS 10
 
+// Forward declaration of Func type
+class Func;
+
 // Allowed node types in the syntax tree; more need to be added for the full language
 typedef enum {
   LIST_NODE,   // corresponds to a list of random stuff
@@ -29,7 +32,11 @@ public:
 
   NodeType      type;                 // Node type
   int           argc;                 // Number of arguments
-  int           index;                // Function/Variable index
+
+  union {
+    int         index;                // Variable index
+    Func*       func;                 // Function reference
+  };
 
   union {
     AstNode    *argv[MAX_ARGUMENTS];  // All arguments
@@ -39,7 +46,10 @@ public:
 
   AstNode(NodeType);
   ~AstNode(void);
-  
+
+  void pushArg(AstNode*);
+  int resolve(Func*);
+  int eval(int*);
 };
 
 #endif

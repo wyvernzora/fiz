@@ -3,9 +3,11 @@
 #include "ast.h"
 
 AstNode::AstNode(NodeType t) {
-  type = t;
-  argc = 0;
+  type  = t;
+  argc  = 0;
+  index = -1;
 }
+
 AstNode::~AstNode(void) {
   switch (type) {
 
@@ -35,5 +37,75 @@ AstNode::~AstNode(void) {
       delete argv[1]; // Delete function arguments
     }
     break;
+  }
+}
+
+void
+AstNode::pushArg(AstNode *arg) {
+  if (argc >= MAX_ARGUMENTS) {
+    PANIC("Number of arguments exceeds %d.\n", MAX_ARGUMENTS);
+  }
+  argv[argc++] = arg;
+}
+
+int
+AstNode::resolve(Func *fn) {
+  switch (type) {
+
+    case FCALL_NODE: {
+      int       result = 1;
+      AstNode  *args   = argv[1];
+
+      // Resolve arguments
+      for (int i = 0; i < args -> argc; i++)
+        result &= args -> argv[i] -> resolve(fn);
+
+      return result;
+    }
+
+    case ID_NODE: {
+      int   index = -1;
+      char *name  = strValue;
+
+      // Find the argument if there is a custom function
+      if (fn)
+        for (int i = 0; i < fn->argc; i++)
+          if (!strcmp(fn->argv[i], name)) {
+            index = i;
+            break;
+          }
+
+      // Variable not found.. sad panda (Ｔ▽Ｔ)
+      if (index < 0) {
+        WARN("Variable '%s' is undefined.\n", name);
+        return 0;
+      }
+
+      this->index = index;
+      return 1;
+    }
+
+    default: return 1;
+  }
+}
+
+int
+AstNode::eval(int* env) {
+  switch (type) {
+
+    case NUMBER_NODE: return intValue;
+
+    case ID_NODE: return env[index];
+
+    case FCALL_NODE: {
+      char      *name =      argv[0]->strValue;
+      int        count =     argv[1]->argc;
+      AstNode  **arguments = argv[1]->argv;
+
+      return call_function(name, arguments, count, env);
+    }
+
+    default: PANIC("Unexpected node type during evaluation.\n");
+
   }
 }

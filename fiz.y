@@ -17,8 +17,6 @@
    #include <string.h>
    #include "ast.h"
    #include "func.h"
-   #include "resolve.h"
-   #include "eval.h"
 
    #define YYMAXDEPTH 1000000
 
@@ -72,7 +70,7 @@
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
       Func* fn = new Func($4 -> strValue);
       fn->argc = 0;
-      resolve($6, NULL);
+      $6->resolve(NULL);
       fn->body = $6;
       registerFunction(fn);
 
@@ -97,7 +95,7 @@
       delete $4;
       delete $5;
 
-      resolve($7, fn);
+      $7 -> resolve(fn);
       fn->body = $7;
 
       if (verbose) { printf("]\n"); }
@@ -105,10 +103,10 @@
       prompt();
     } |
     expr {
-      int success = resolve($1, NULL);
+      int success = $1 -> resolve(NULL);
 
       if (success) {
-        printf ("%d\n", eval($1, NULL));
+        printf ("%d\n", $1 -> eval(NULL));
       }
       delete $1;
 
@@ -127,16 +125,11 @@
   identifiers:
     identifier {
       AstNode *node = new AstNode(LIST_NODE);
-      node -> argv[0] = $1;
-      node -> argc = 1;
+      node -> pushArg($1);
       $$ = node;
     } |
     identifiers identifier {
-      if ($1->argc >= MAX_ARGUMENTS) {
-        fprintf(stderr, "Number of arguments exceeds 10.\n");
-        exit(1);
-      }
-      $1 -> argv[$1->argc++] = $2;
+      $1 -> pushArg($2);
       $$ = $1;
     }
   ;
@@ -169,17 +162,11 @@
   exprs:
     expr {
       AstNode *node = new AstNode(LIST_NODE);
-      node -> argv[0] = $1;
-      node -> argc = 1;
+      node -> pushArg($1);
       $$ = node;
-
     } |
     exprs expr {
-      if ($1->argc >= MAX_ARGUMENTS) {
-        fprintf(stderr, "Number of arguments exceeds 10.\n");
-        exit(1);
-      }
-      $1->argv[$1->argc++] = $2;
+      $1 -> pushArg($2);
       $$ = $1;
     }
   ;

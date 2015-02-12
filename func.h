@@ -50,14 +50,10 @@ void registerFunction(Func*);
 // Call a function
 int call_function(char*, AstNode**, int, int*);
 
-// Determines whether a function is a builtin function
-BuiltInFunc find_builtin_func(char*);
-
 // BUILTIN FUNCTIONS
 int fiz_inc(AstNode**, int, int*);
 int fiz_dec(AstNode**, int, int*);
 int fiz_ifz(AstNode**, int, int*);
 int fiz_halt(AstNode**, int, int*);
-
 
 #endif

@@ -3,10 +3,10 @@
 #include <string.h>
 #include "ast.h"
 #include "func.h"
-#include "eval.h"
 #include "trace.h"
 #include "global.h"
 
+// FIZ Functions
 Func::Func() { }
 
 Func::Func(char *n) {
@@ -19,30 +19,33 @@ Func::~Func(void) {
   delete body;
 }
 
-int Func::call(AstNode *argv[], int argc, int *env) {
+int
+Func::call(AstNode *argv[], int argc, int *env) {
   if (argc != this->argc) {
     PANIC("%s expects %d arguments but got %d\n", name, this->argc, argc);
   }
 
   int *params = new int[MAX_ARGUMENTS];
-  for (int i = 0; i < argc; i++) { params[i] = eval(argv[i], env); }
-  int result = eval(body, params);
+  for (int i = 0; i < argc; i++) { params[i] = argv[i] -> eval(env); }
+  int result = body -> eval(params);
   delete params;
   return result;
 }
 
-
+// Native Functions
 NativeFunc::NativeFunc(const char *name, int argc, BuiltInFunc native) {
   this->argc = argc;
   this->name = strdup(name);
   this->native = native;
+  this->body = NULL;
 }
 
 NativeFunc::~NativeFunc(void) {
   delete name;
 }
 
-int NativeFunc::call(AstNode *argv[], int argc, int *env) {
+int
+NativeFunc::call(AstNode *argv[], int argc, int *env) {
   return (*native)(argv, argc, env);
 }
 
@@ -90,36 +93,27 @@ int call_function(char *name, AstNode *argv[], int argc, int* env) {
   return fn->call(argv, argc, env);
 }
 
-BuiltInFunc find_builtin_func(char *name) {
-  if (!strcmp(name, "inc")) { return &fiz_inc; }
-  if (!strcmp(name, "dec")) { return &fiz_dec; }
-  if (!strcmp(name, "ifz")) { return &fiz_ifz; }
-  if (!strcmp(name, "halt")) { return &fiz_halt; }
-  return NULL;
-}
-
 // BUILTIN FUNCTIONS
 int fiz_inc(AstNode* argv[], int argc, int *env) {
-  int value = eval(argv[0], env);
+  int value = argv[0] -> eval(env);
   return value + 1;
 }
 int fiz_dec(AstNode* argv[], int argc, int *env) {
-  int value = eval(argv[0], env);
+  int value = argv[0] -> eval(env);
   if (value <= 0) { PANIC("Attempt to (dec 0).\n"); }
   return value - 1;
 }
 int fiz_ifz(AstNode* argv[], int argc, int *env) {
-  int cond = eval(argv[0], env);
+  int cond = argv[0] -> eval(env);
   int value;
   if (!cond) {
-    value = eval(argv[1], env);
+    value = argv[1] -> eval(env);
   } else {
-    value = eval(argv[2], env);
+    value = argv[2] -> eval(env);
   }
   return value;
 }
 int fiz_halt(AstNode* argv[], int argc, int *env) {
   // Panic!
   PANIC("Halted.");
-  exit(1);
 }
