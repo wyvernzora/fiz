@@ -10,7 +10,11 @@
 #ifndef RESOLVE_H
 #define RESOLVE_H
 
-// Resolve the usage of functions and arguments in an expression
-int resolve(AstNode*, Func*);
+extern "C" {
+
+  // Resolve the usage of functions and arguments in an expression
+  int resolve(AstNode*, Func*);
+
+}
 
 #endif

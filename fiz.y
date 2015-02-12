@@ -40,16 +40,20 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-  #include "func.h"
   #include "ast.h"
+  #include "func.h"
   #include "resolve.h"
   #include "eval.h"
 
   #define YYMAXDEPTH 1000000
 
+  extern "C" {
+
   void yyerror(const char * s);
   void prompt();
   int yylex();
+
+  }
 
   // Verbose mode switch
   int verbose = 0;

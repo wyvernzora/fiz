@@ -1,8 +1,9 @@
 # Makefile for fiz
 
 CC=gcc
+CXX=c++
 
-CFLAGS= -std=gnu99 -g
+CFLAGS= -g
 LEX=flex
 YACC=yacc
 LFL=-lfl
@@ -18,19 +19,19 @@ all: fiz cleantmp test
 
 noclean: fiz test
 
-lex.yy.o: fiz.l y.tab.h
+lex.yy.o: fiz.l y.tab.hh
 	$(LEX) fiz.l
 	$(CC) $(CFLAGS) -c lex.yy.c
 
 y.tab.o: fiz.y
-	$(YACC) -d fiz.y
-	$(CC) $(CFLAGS) -c y.tab.c
+	$(YACC) -d fiz.y -o y.tab.cc
+	$(CC) $(CFLAGS) -c y.tab.cc
 
 cfiles:
-	$(CC) $(CFLAGS) -c func.c
-	$(CC) $(CFLAGS) -c ast.c
-	$(CC) $(CFLAGS) -c eval.c
-	$(CC) $(CFLAGS) -c resolve.c
+	$(CXX) $(CFLAGS) -c func.cc
+	$(CXX) $(CFLAGS) -c ast.cc
+	$(CXX) $(CFLAGS) -c eval.cc
+	$(CXX) $(CFLAGS) -c resolve.cc
 
 fiz: y.tab.o lex.yy.o cfiles
 	$(CC) -o fiz lex.yy.o y.tab.o func.o ast.o eval.o resolve.o $(LFL)

@@ -3,6 +3,5 @@ fiz
 !Makefile
 *.o
 *.yy.c
-*.tab.h
-*.tab.c
+*.tab.*
 node_modules

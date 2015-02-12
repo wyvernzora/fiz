@@ -37,8 +37,11 @@ typedef struct TREE_NODE {
 
 } AstNode;
 
-// Free memory occupied by the AstNode and its children
-void deleteNode(AstNode*);
+extern "C" {
 
+  // Free memory occupied by the AstNode and its children
+  void deleteNode(AstNode*);
+
+}
 
 #endif

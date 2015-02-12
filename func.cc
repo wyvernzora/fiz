@@ -5,8 +5,7 @@
 #include "func.h"
 #include "eval.h"
 #include "trace.h"
-
-int numFuncs = 0;
+#include "global.h"
 
 // Find a function metadata from the table
 Func* find_function(char *name) {
