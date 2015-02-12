@@ -34,7 +34,7 @@
     ✓ should correctly parse function definition without arguments 
     ✓ should correctly handle definition of up to 1000 functions 
     ✓ should correctly handle recursive definitions 
-    ✓ should panic when the number of defined functions exceeds 1000 (301ms)
+    ✓ should panic when the number of defined functions exceeds 1000 
     ✓ should panic when refefining an existing function 
     ✓ should panic when function is defined with more than 10 arguments 
 
@@ -62,5 +62,5 @@
     ✓ issue #1: variables within user-defined function definitions are reported as undefined 
 
 
-  43 passing (614ms)
+  43 passing (334ms)
 
