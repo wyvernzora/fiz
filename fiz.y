@@ -8,7 +8,33 @@
  */
 
 /********************************************************************************
- * Beginning of Section 1: Definition of tokens and non-terminal in the grammar *
+  * Beginning of Section 1: C data type and global variable definitions to be    *
+  *  included in the generated y.tab.c file                                      *
+  ********************************************************************************/
+ %{
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <string.h>
+   #include "ast.h"
+   #include "func.h"
+   #include "resolve.h"
+   #include "eval.h"
+
+   #define YYMAXDEPTH 1000000
+
+   void yyerror(const char * s);
+   void prompt();
+   int yylex();
+
+   // Verbose mode switch
+   int verbose = 0;
+   int noprompt = 0;
+
+   int err_value = 0;
+ %}
+
+/********************************************************************************
+ * Beginning of Section 2: Definition of tokens and non-terminal in the grammar *
  ********************************************************************************/
 
 // Tokens are defined here.
@@ -27,40 +53,10 @@
 %type <node_val> identifiers
 
 %union  {
-  int    number_val;
-  char   *string_val;
-  struct TREE_NODE *node_val;
+  int      number_val;
+  char    *string_val;
+  AstNode *node_val;
 }
-
-/********************************************************************************
- * Beginning of Section 2: C data type and global variable definitions to be    *
- *  included in the generated y.tab.c file                                      *
- ********************************************************************************/
-%{
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  #include "ast.h"
-  #include "func.h"
-  #include "resolve.h"
-  #include "eval.h"
-
-  #define YYMAXDEPTH 1000000
-
-  extern "C" {
-
-  void yyerror(const char * s);
-  void prompt();
-  int yylex();
-
-  }
-
-  // Verbose mode switch
-  int verbose = 0;
-  int noprompt = 0;
-
-  int err_value = 0;
-%}
 
 /********************************************************************************
  * Beginning of Section 3: Grammar production rule definitions and associated   *
@@ -130,7 +126,7 @@
 
   identifier:
     IDENTIFIER {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = ID_NODE;
       node -> strValue = $1;
       $$ = node;
@@ -139,7 +135,7 @@
 
   identifiers:
     identifier {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = LIST_NODE;
       node -> argv[0] = $1;
       node -> argc = 1;
@@ -157,11 +153,11 @@
 
   expr:
     OPENPAR identifier CLOSEPAR {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = FCALL_NODE;
       node -> argv[0] = $2;
 
-      AstNode *argn = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *argn = new AstNode();
       argn -> type = LIST_NODE;
       argn -> argc = 0;
 
@@ -169,14 +165,14 @@
       $$ = node;
     } |
     OPENPAR identifier exprs CLOSEPAR {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = FCALL_NODE;
       node -> argv[0] = $2;
       node -> argv[1] = $3;
       $$ = node;
     } |
     NUMBER {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = NUMBER_NODE;
       node -> intValue = $1;
       $$ = node;
@@ -186,7 +182,7 @@
 
   exprs:
     expr {
-      AstNode *node = (AstNode*) malloc(sizeof(AstNode));
+      AstNode *node = new AstNode();
       node -> type = LIST_NODE;
       node -> argv[0] = $1;
       node -> argc = 1;

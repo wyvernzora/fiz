@@ -2,6 +2,11 @@
 #include "func.h"
 #include "ast.h"
 
+//AstNode::AstNode(void) { }
+//AstNode::~AstNode(void) {
+
+//}
+
 void deleteNode(AstNode* node) {
 
   switch (node->type) {
@@ -9,15 +14,15 @@ void deleteNode(AstNode* node) {
     // LEAF: Identifier
     case ID_NODE: {
       TRACE("del ID_NODE [%s]\n", node->strValue);
-      free(node->strValue); // Delete the identifier name
-      free(node);
+      delete node->strValue; // Delete the identifier name
+      delete node;
     }
     break;
 
     // LEAF: Number
     case NUMBER_NODE: {
       TRACE("del NUMBER_NODE [%d]\n", node->intValue);
-      free(node);
+      delete node;
     }
     break;
 
@@ -25,7 +30,7 @@ void deleteNode(AstNode* node) {
       TRACE("del LIST_NODE [%d]\n", node->argc);
       // Delete list contents
       for (int i = 0; i < node->argc; i++) { deleteNode(node->argv[i]); }
-      free(node);
+      delete node;
     }
     break;
 
@@ -34,7 +39,7 @@ void deleteNode(AstNode* node) {
       TRACE("del FCALL_NODE [%s]\n", node->argv[0]->strValue);
       deleteNode(node->argv[0]); // Delete function name
       deleteNode(node->argv[1]); // Delete function arguments
-      free(node); // Delete the node itself
+      delete node; // Delete the node itself
     }
     break;
   }

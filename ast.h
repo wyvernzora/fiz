@@ -22,20 +22,25 @@ typedef enum {
   NUMBER_NODE
 } NodeType;
 
-// Below is the data type for a node in the syntax tree
-typedef struct TREE_NODE {
+// AST Node (POD)
+class AstNode {
 
-  NodeType           type;                 // Node type
-  int                argc;                 // Number of arguments
-  int                index;                // Function/Variable index
+public:
+
+  NodeType      type;                 // Node type
+  int           argc;                 // Number of arguments
+  int           index;                // Function/Variable index
 
   union {
-    struct TREE_NODE *argv[MAX_ARGUMENTS]; // All arguments
-    char             *strValue;            // For ID_NODE
-    int               intValue;            // For NUMBER_NODE
+    AstNode    *argv[MAX_ARGUMENTS];  // All arguments
+    char       *strValue;             // For ID_NODE
+    int         intValue;             // For NUMBER_NODE
   };
 
-} AstNode;
+  //AstNode(void);
+  //~AstNode(void);
+
+};
 
 extern "C" {
 

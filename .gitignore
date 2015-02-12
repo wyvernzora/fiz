@@ -2,6 +2,6 @@ fiz
 !fiz.*
 !Makefile
 *.o
-*.yy.c
+*.yy.*
 *.tab.*
 node_modules
