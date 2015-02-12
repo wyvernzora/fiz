@@ -7,6 +7,7 @@ util = require 'util'
 
 # Test target
 target = './fiz'
+genericErrors = yes
 
 # Convenience function for testing
 run = (flags, input, output, errmsg, callback) ->
@@ -15,7 +16,10 @@ run = (flags, input, output, errmsg, callback) ->
       if output
         expect(stdout.replace(/\S*fiz>\S*/g, '').trim()).to.be.equal(output)
       if errmsg
-        expect(stderr.toLowerCase()).to.contain(errmsg.toLowerCase())
+        if genericErrors
+          expect(stderr).to.not.have.length(0)
+        else
+          expect(stderr.toLowerCase()).to.contain(errmsg.toLowerCase())
       else if errmsg is null
         expect(stderr).to.have.length.of(0)
       callback()

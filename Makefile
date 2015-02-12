@@ -38,7 +38,7 @@ test: fiz
 	-mocha --reporter nyan
 
 cleantmp:
-	rm -f lex.yy.c y.tab.c y.tab.h *.o
+	rm -f lex.yy.cc y.tab.cc y.tab.hh *.o
 
 clean: cleantmp
 	rm -f fiz
