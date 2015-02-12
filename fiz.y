@@ -45,6 +45,8 @@
   #include "resolve.h"
   #include "eval.h"
 
+  #define YYMAXDEPTH 1000000
+
   void yyerror(const char * s);
   void prompt();
   int yylex();
