@@ -16,7 +16,7 @@
 // Builtin function signature
 typedef int (*BuiltInFunc)(AstNode**, int, int*);
 
-// Function type
+// FIZ-scripted Function
 class Func {
 public:
   int               argc;
@@ -31,6 +31,7 @@ public:
   virtual int call(AstNode**, int, int*);
 };
 
+// Native Function
 class NativeFunc : public Func {
 private:
   int (*native)(AstNode**, int, int*);
@@ -41,14 +42,28 @@ public:
   int call(AstNode**, int, int*);
 };
 
-// Find a function and return it's metadata
-Func * find_function(char*);
+// Function Registry
+class BST {
+public:
+  char    *key;
+  Func    *value;
+  BST     *lnode;
+  BST     *rnode;
 
-// Define a function
-void registerFunction(Func*);
+  BST(Func*);
+  int insert(BST*);
+  BST* find(const char*);
+};
 
-// Call a function
-int call_function(char*, AstNode**, int, int*);
+class FuncRegistry {
+private:
+  int      count;
+  BST     *root;
+public:
+  FuncRegistry(void) : count(0), root(NULL) { };
+  int   reg(Func*);
+  Func* find(const char*);
+};
 
 // BUILTIN FUNCTIONS
 int fiz_inc(AstNode**, int, int*);

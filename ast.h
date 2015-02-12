@@ -17,7 +17,7 @@
 // Forward declaration of Func type
 class Func;
 
-// Allowed node types in the syntax tree; more need to be added for the full language
+// AST Node Types
 typedef enum {
   LIST_NODE,   // corresponds to a list of random stuff
   ID_NODE,     // corresponds to an identifier
@@ -25,9 +25,8 @@ typedef enum {
   NUMBER_NODE
 } NodeType;
 
-// AST Node (POD)
+// AST Node
 class AstNode {
-
 public:
 
   NodeType      type;                 // Node type

@@ -15,8 +15,11 @@
    #include <stdio.h>
    #include <stdlib.h>
    #include <string.h>
+   #include <sys/poll.h>
    #include "ast.h"
+   #include "global.h"
    #include "func.h"
+   #include "trace.h"
 
    #define YYMAXDEPTH 1000000
 
@@ -72,7 +75,7 @@
       fn->argc = 0;
       $6->resolve(NULL);
       fn->body = $6;
-      registerFunction(fn);
+      functions -> reg(fn);
 
       if (verbose) { printf("func = %s; no-args\n", fn->name); }
 
@@ -90,13 +93,19 @@
         fn->argv[i] = strdup($5->argv[i]->strValue);
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
-      registerFunction(fn);
+      int success = functions -> reg(fn);
+
+      if (success) {
+        $7 -> resolve(fn);
+        fn->body = $7;
+      }
+      else {
+        WARN("Function '%s' already defined.\n", fn -> name);
+        delete fn;
+      }
 
       delete $4;
       delete $5;
-
-      $7 -> resolve(fn);
-      fn->body = $7;
 
       if (verbose) { printf("]\n"); }
 
@@ -180,7 +189,7 @@ void yyerror(const char * s) {
 }
 
 void prompt() {
-  if (!noprompt) { printf("fiz> "); }
+  if (!noprompt) { printf("\x1B[36mfiz> \x1B[0m"); }
 }
 
 int main(int argc, char *argv[]) {
@@ -188,14 +197,24 @@ int main(int argc, char *argv[]) {
   // Command line arguments
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-v") == 0) { verbose = 1; }
-    if (strcmp(argv[i], "-n") == 0) { noprompt = 1; }
   }
 
+  // Function Registry
+  functions = new FuncRegistry();
+
   // Load builtin functions
-  registerFunction(new NativeFunc("inc",  1, &fiz_inc));
-  registerFunction(new NativeFunc("dec",  1, &fiz_dec));
-  registerFunction(new NativeFunc("ifz",  3, &fiz_ifz));
-  registerFunction(new NativeFunc("halt", 0, &fiz_halt));
+  functions -> reg(new NativeFunc("inc",  1, &fiz_inc));
+  functions -> reg(new NativeFunc("dec",  1, &fiz_dec));
+  functions -> reg(new NativeFunc("ifz",  3, &fiz_ifz));
+  functions -> reg(new NativeFunc("halt", 0, &fiz_halt));
+
+  // Detect STDIN
+  struct pollfd fds;
+  fds.fd = 0;
+  fds.events = POLLIN;
+  int ret = poll(&fds, 1, 0);
+  if(ret == 1) noprompt = 1;
+  else if(ret == 0) noprompt = 0;
 
   prompt();
   yyparse();

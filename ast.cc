@@ -1,3 +1,4 @@
+#include "global.h"
 #include "trace.h"
 #include "func.h"
 #include "ast.h"
@@ -53,14 +54,13 @@ AstNode::resolve(Func *fn) {
   switch (type) {
 
     case FCALL_NODE: {
-      int       result = 1;
       AstNode  *args   = argv[1];
 
       // Resolve arguments
       for (int i = 0; i < args -> argc; i++)
-        result &= args -> argv[i] -> resolve(fn);
+        if (!args -> argv[i] -> resolve(fn)) return 0;
 
-      return result;
+      return 1;
     }
 
     case ID_NODE: {
@@ -68,12 +68,14 @@ AstNode::resolve(Func *fn) {
       char *name  = strValue;
 
       // Find the argument if there is a custom function
-      if (fn)
-        for (int i = 0; i < fn->argc; i++)
+      if (fn) {
+        for (int i = 0; i < fn->argc; i++) {
           if (!strcmp(fn->argv[i], name)) {
             index = i;
             break;
           }
+        }
+      }
 
       // Variable not found.. sad panda (Ｔ▽Ｔ)
       if (index < 0) {
@@ -102,7 +104,20 @@ AstNode::eval(int* env) {
       int        count =     argv[1]->argc;
       AstNode  **arguments = argv[1]->argv;
 
-      return call_function(name, arguments, count, env);
+      Func* fn = functions -> find(name);
+      if (!fn) {
+        PANIC("Function '%s' is undefined.\n", argv[0] -> strValue);
+      }
+      func = fn;
+
+      // Check the number of args
+      if (count != fn -> argc) {
+        WARN("%s expects %d argument%s but got %d.\n",
+          fn->name, fn->argc, (fn->argc == 1 ? "" : "s"), count);
+        return 0;
+      }
+
+      return func -> call(arguments, count, env);
     }
 
     default: PANIC("Unexpected node type during evaluation.\n");

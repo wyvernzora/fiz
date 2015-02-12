@@ -6,7 +6,7 @@
 #include "trace.h"
 #include "global.h"
 
-// FIZ Functions
+// FIZ-scripted Functions
 Func::Func() { }
 
 Func::Func(char *n) {
@@ -49,49 +49,82 @@ NativeFunc::call(AstNode *argv[], int argc, int *env) {
   return (*native)(argv, argc, env);
 }
 
-
-// Find a function metadata from the table
-Func * find_function(char *name) {
-  for (int i = 0; i < numFuncs; i++) {
-  if (!strcmp(functions[i] -> name, name))
-    return functions[i];
-  }
-  return NULL;
+// BST
+BST::BST(Func* fn) {
+  key   = fn->name;
+  value = fn;
+  lnode = NULL;
+  rnode = NULL;
 }
 
-// Define a function
-void registerFunction(Func* fn) {
+int
+BST::insert(BST* node) {
+  int cond = strcmp(key, node->key);
 
-  if (numFuncs >= MAX_FUNCTIONS + BUILTIN_FUNCTIONS) {
-    PANIC("ERROR: Number of defined functions exceeds %d.\n", MAX_FUNCTIONS);
+  if (cond > 0) {
+    if (rnode) { return rnode -> insert(node); }
+    else {
+      rnode = node;
+      return 1;
+    }
   }
-
-  if (find_function(fn->name)) {
-    PANIC("ERROR: Function '%s' already defined.\n", fn->name);
+  else if (cond < 0) {
+    if (lnode) { return lnode -> insert(node); }
+    else {
+      lnode = node;
+      return 1;
+    }
   }
-
-  functions[numFuncs++] = fn;
+  else return 0;
 }
 
-// Call a function (basically, eval() for a function)
-int call_function(char *name, AstNode *argv[], int argc, int* env) {
+BST*
+BST::find(const char* key) {
+  int cond = strcmp(this->key, key);
 
-  // Find the function body
-  Func* fn = find_function(name);
+  if (cond > 0) {
+    if (rnode) { return rnode -> find(key); }
+    else return NULL;
+  }
+  else if (cond < 0) {
+    if (lnode) { return lnode -> find(key); }
+    else return NULL;
+  }
+  else return this;
+}
 
-  // Did not find the function you were looking for! Scream! Run! Panic!
-  if (!fn) { PANIC("Function '%s' is undefined.", name); }
 
-
-  // Check the number of arguments
-  if (argc != fn->argc) {
-    PANIC("ERROR: %s expects %d argument%s but got %d.\n", name,
-      fn->argc, (fn->argc == 1 ? "" : "s"), argc);
+// Function Registry
+int
+FuncRegistry::reg(Func* fn) {
+  if (count >= MAX_FUNCTIONS + BUILTIN_FUNCTIONS) {
+    PANIC("Number of defined functions exceeds %d.\n", MAX_FUNCTIONS);
   }
 
-  // Let's go on with our lives
-  return fn->call(argv, argc, env);
+  BST* node = new BST(fn);
+  if (!root) {
+    root = node;
+    count = 1;
+    return 1;
+  }
+  else {
+    int result = root -> insert(node);
+    if (!result) delete node;
+    else count++;
+    return result;
+  }
 }
+
+Func*
+FuncRegistry::find(const char* name) {
+  if (!root) return NULL;
+  else {
+    BST *node = root -> find(name);
+    if (!node) { return NULL; }
+    return node -> value;
+  }
+}
+
 
 // BUILTIN FUNCTIONS
 int fiz_inc(AstNode* argv[], int argc, int *env) {
