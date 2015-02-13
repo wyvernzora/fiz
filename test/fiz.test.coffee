@@ -14,7 +14,7 @@ run = (flags, input, output, errmsg, callback) ->
   exec "echo \"#{input}\" | #{target} #{flags}", (error, stdout, stderr) ->
     try
       if output
-        expect(stdout.replace(/\S*fiz>\S*/g, '').trim()).to.be.equal(output)
+        expect(stdout.replace(/\S*fiz>\S*/g, '').trim()).to.contain(output)
       if errmsg
         if genericErrors
           expect(stderr).to.not.have.length(0)

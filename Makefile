@@ -19,13 +19,13 @@ all: fiz cleantmp test
 
 noclean: fiz test
 
-lex.yy.o: fiz.l y.tab.hh
+lex.yy.o: fiz.l y.tab.h
 	$(LEX) --outfile lex.yy.cc fiz.l
 	$(CXX) $(CFLAGS) -c lex.yy.cc
 
 y.tab.o: fiz.y
-	$(YACC) -d fiz.y -o y.tab.cc
-	$(CXX) $(CFLAGS) -c y.tab.cc
+	$(YACC) -d fiz.y
+	$(CXX) $(CFLAGS) -c y.tab.c
 
 cfiles:
 	$(CXX) $(CFLAGS) -c func.cc
