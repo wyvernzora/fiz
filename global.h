@@ -10,3 +10,6 @@ class FuncRegistry;
 extern FuncRegistry *functions;
 
 #endif
+
+// Uncomment this to enable functions with no arguments
+//#define FUNC_ZERO_ARG

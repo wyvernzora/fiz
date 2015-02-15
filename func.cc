@@ -21,6 +21,14 @@ Func::~Func(void) {
 
 int
 Func::call(AstNode *argv[], int argc, int *env) {
+
+  #ifndef FUNC_ZERO_ARG
+    if (argc == 0) {
+      WARN("User-defined function calls without arguments are not allowed.\n");
+      PANIC("#define FUNC_NO_ARGS to enable this behavior.\n");
+    }
+  #endif
+
   if (argc != this->argc) {
     PANIC("%s expects %d arguments but got %d\n", name, this->argc, argc);
   }

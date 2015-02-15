@@ -71,6 +71,12 @@
 
   statement:
     OPENPAR DEFINE OPENPAR identifier CLOSEPAR expr CLOSEPAR {
+
+      #ifndef FUNC_ZERO_ARG
+        WARN("Function definitions without arguments are not allowed.\n");
+        PANIC("#define FUNC_NO_ARGS to enable this behavior.\n");
+      #endif
+
       Func* fn = new Func($4 -> strValue);
       fn->argc = 0;
       $6->resolve(NULL);

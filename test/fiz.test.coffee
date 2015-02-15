@@ -130,10 +130,6 @@ describe '(define ...)', ->
     script = '(define (func a1 a2 a3 a4 a5) (inc 0))'
     run '-n -v', script, 'func = func; args = [a1 a2 a3 a4 a5 ]', '', done
 
-  it 'should correctly parse function definition without arguments', (done) ->
-    script = '(define (func) (inc 0))'
-    run '-n -v', script, 'func = func; no-args', null, done
-
   it 'should correctly handle definition of up to 1000 functions', (done) ->
     script = ''
     script += "(define (f#{i} a b) (inc 0))\n" for i in [0...1000]
@@ -146,12 +142,16 @@ describe '(define ...)', ->
     '''
     run '-n', script, '3', null, done
 
+  it 'should panic when defining function with no arguments', (done) ->
+    script = '(define (func) (inc 0))'
+    run '-n -v', script, null, 'Function definitions without arguments are not allowed.', done
+
   it 'should panic when the number of defined functions exceeds 1000', (done) ->
     script = ''
     script += "(define (f#{i} a b) (inc 0))\n" for i in [0..1000]
     run '-n -v', script, null, 'Number of defined functions exceeds 1000.', done
 
-  it 'should panic when refefining an existing function', (done) ->
+  it 'should panic when redefining an existing function', (done) ->
     script = '''
     (define (func a1) (inc 998))
     (define (func a1 a2) (dec 998))
@@ -217,7 +217,7 @@ describe '(func ...)', ->
     (func 1 2 3 4 5 6 7 8 9 10)
     '''
     run '-n', script, null, 'Number of arguments exceeds 10.', done
-
+    
 describe 'Test cases from the lab assignment', ->
 
   it '(inc (inc 5)) should result in 7', (done) ->
