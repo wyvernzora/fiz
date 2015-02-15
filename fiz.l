@@ -16,13 +16,42 @@
 // the definitions of all tokens
 #include "ast.h"
 #include "y.tab.h"
+#include "global.h"
+
+int loading;
 
 /********************************************************************************
  * Below is Section 2: Regular expressions and associated code                  *
  ********************************************************************************/
 %}
 
+%x incl
 %%
+
+"import"      BEGIN(incl);
+
+<incl>[ \t]*      /* eat the whitespace */
+<incl>[^ \t\n]+   { /* got the include file name */
+  yyin = fopen( yytext, "r" );
+
+  if ( ! yyin ) {
+    fprintf(stderr, "Unable to open file %s.\n", yytext);
+    exit(1);
+  }
+  loading = 1;
+  yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+  BEGIN(INITIAL);
+}
+
+<<EOF>> {
+  yypop_buffer_state();
+  loading = 0;
+  if ( !YY_CURRENT_BUFFER ) {
+      yyterminate();
+  }
+  printf("\x1B[36mfiz> \x1B[0m");
+}
+
 "define" { return DEFINE; }
 
 [_a-zA-Z][_a-zA-Z0-9]* {

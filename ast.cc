@@ -112,9 +112,8 @@ AstNode::eval(int* env) {
 
       // Check the number of args
       if (count != fn -> argc) {
-        WARN("%s expects %d argument%s but got %d.\n",
+        PANIC("%s expects %d argument%s but got %d.\n",
           fn->name, fn->argc, (fn->argc == 1 ? "" : "s"), count);
-        return 0;
       }
 
       return func -> call(arguments, count, env);
