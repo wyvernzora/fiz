@@ -60,6 +60,8 @@ private:
   int      count;
   BST     *root;
 public:
+  Func* temporary;
+
   FuncRegistry(void) : count(0), root(NULL) { };
   int   reg(Func*);
   Func* find(const char*);
