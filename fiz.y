@@ -86,6 +86,7 @@
       if (!success) {
         delete fn;
         delete $6;
+        PANIC("Function '%s' already defined.\n", fn -> name);
       }
 
       if (verbose) { printf("func = %s; no-args\n", fn->name); }
@@ -111,9 +112,9 @@
         fn->body = $7;
       }
       else {
-        WARN("Function '%s' already defined.\n", fn -> name);
         delete fn;
         delete $7;
+        PANIC("Function '%s' already defined.\n", fn -> name);
       }
 
       delete $4;
