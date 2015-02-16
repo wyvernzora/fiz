@@ -104,20 +104,14 @@
         fn->argv[i] = strdup($5->argv[i]->strValue);
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
+      int success = functions -> reg(fn);
 
-      functions -> temporary = fn;
-      if ($7 -> resolve(fn)) {
-        fn -> body = $7;
-        functions -> temporary = NULL;
-
-        if (!functions -> reg(fn)) {
-          WARN("Function '%s' already defined.\n", fn -> name);
-          delete fn;
-          delete $7;
-        }
-
+      if (success) {
+        $7 -> resolve(fn);
+        fn->body = $7;
       }
       else {
+        WARN("Function '%s' already defined.\n", fn -> name);
         delete fn;
         delete $7;
       }
@@ -132,8 +126,9 @@
     expr {
       int success = $1 -> resolve(NULL);
 
-      if (success) { success = $1 -> eval(NULL); }
-      if (success >= 0) { printf ("%d\n", success); }
+      if (success) {
+        printf ("%d\n", $1 -> eval(NULL));
+      }
       delete $1;
 
       prompt();

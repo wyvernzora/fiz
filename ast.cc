@@ -106,16 +106,14 @@ AstNode::eval(int* env) {
 
       Func* fn = functions -> find(name);
       if (!fn) {
-        WARN("Function '%s' is undefined.\n", argv[0] -> strValue);
-        return -1;
+        PANIC("Function '%s' is undefined.\n", argv[0] -> strValue);
       }
       func = fn;
 
       // Check the number of args
       if (count != fn -> argc) {
-        WARN("%s expects %d argument%s but got %d.\n",
+        PANIC("%s expects %d argument%s but got %d.\n",
           fn->name, fn->argc, (fn->argc == 1 ? "" : "s"), count);
-        return -1;
       }
 
       return func -> call(arguments, count, env);
