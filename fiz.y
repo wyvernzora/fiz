@@ -81,7 +81,12 @@
       fn->argc = 0;
       $6->resolve(NULL);
       fn->body = $6;
-      functions -> reg(fn);
+      int success = functions -> reg(fn);
+
+      if (!success) {
+        delete fn;
+        delete $6;
+      }
 
       if (verbose) { printf("func = %s; no-args\n", fn->name); }
 
@@ -108,6 +113,7 @@
       else {
         WARN("Function '%s' already defined.\n", fn -> name);
         delete fn;
+        delete $7;
       }
 
       delete $4;
