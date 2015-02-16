@@ -15,7 +15,7 @@
    #include <stdio.h>
    #include <stdlib.h>
    #include <string.h>
-   #include <sys/poll.h>
+   #include <unistd.h>
    #include "ast.h"
    #include "global.h"
    #include "func.h"
@@ -226,12 +226,7 @@ int main(int argc, char *argv[]) {
   functions -> reg(new NativeFunc("halt", 0, &fiz_halt));
 
   // Detect STDIN
-  struct pollfd fds;
-  fds.fd = 0;
-  fds.events = POLLIN;
-  int ret = poll(&fds, 1, 0);
-  if(ret == 1) noprompt = 1;
-  else if(ret == 0) noprompt = 0;
+  if (!isatty(fileno(stdin))) { noprompt = 1; }
 
   prompt();
   yyparse();
