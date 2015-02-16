@@ -125,6 +125,7 @@ FuncRegistry::reg(Func* fn) {
 
 Func*
 FuncRegistry::find(const char* name) {
+  if (temp && !strcmp(name, temp->name)) return temp;
   if (!root) return NULL;
   else {
     BST *node = root -> find(name);

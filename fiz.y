@@ -74,24 +74,24 @@
 
       #ifndef FUNC_ZERO_ARG
         WARN("Function definitions without arguments are not allowed.\n");
-        PANIC("#define FUNC_NO_ARGS to enable this behavior.\n");
+        WARN("#define FUNC_NO_ARGS to enable this behavior.\n");
+      #else
+        Func* fn = new Func($4 -> strValue);
+        fn->argc = 0;
+        $6->resolve(NULL);
+        fn->body = $6;
+        int success = functions -> reg(fn);
+
+        if (!success) {
+          delete fn;
+          delete $6;
+          PANIC("Function '%s' already defined.\n", fn -> name);
+        }
+
+        if (verbose) { printf("func = %s; no-args\n", fn->name); }
+
+        delete $4;
       #endif
-
-      Func* fn = new Func($4 -> strValue);
-      fn->argc = 0;
-      $6->resolve(NULL);
-      fn->body = $6;
-      int success = functions -> reg(fn);
-
-      if (!success) {
-        delete fn;
-        delete $6;
-        PANIC("Function '%s' already defined.\n", fn -> name);
-      }
-
-      if (verbose) { printf("func = %s; no-args\n", fn->name); }
-
-      delete $4;
 
       prompt();
     } |
@@ -105,16 +105,22 @@
         fn->argv[i] = strdup($5->argv[i]->strValue);
         if (verbose) { printf("%s ", fn->argv[i]); }
       }
-      int success = functions -> reg(fn);
 
-      if (success) {
-        $7 -> resolve(fn);
-        fn->body = $7;
-      }
-      else {
+      functions -> temp = fn;
+
+      if ($7 -> resolve(fn)) {
+
+        fn -> body = $7;
+
+        if (!functions -> reg(fn)) {
+          PANIC("Function '%s' already defined.\n", fn -> name);
+          delete fn;
+          delete $7;
+        }
+
+      } else {
         delete fn;
         delete $7;
-        PANIC("Function '%s' already defined.\n", fn -> name);
       }
 
       delete $4;
