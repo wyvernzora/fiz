@@ -79,8 +79,12 @@ AstNode::resolve(Func *fn) {
 
       // Variable not found.. sad panda (Ｔ▽Ｔ)
       if (index < 0) {
-        WARN("Variable '%s' is undefined.\n", name);
-        return 0;
+        #ifndef STRICT
+          WARN("Variable '%s' is undefined.\n", name);
+          return 0;
+        #else
+          PANIC("Variable '%s' is undefined.\n", name);
+        #endif
       }
 
       this->index = index;

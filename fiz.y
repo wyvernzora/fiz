@@ -74,7 +74,11 @@
 
       #ifndef FUNC_ZERO_ARG
         WARN("Function definitions without arguments are not allowed.\n");
-        WARN("#define FUNC_NO_ARGS to enable this behavior.\n");
+        #ifndef STRICT
+          WARN("#define FUNC_NO_ARGS to enable this behavior.\n");
+        #else
+          PANIC("#define FUNC_NO_ARGS to enable this behavior.\n");
+        #endif
       #else
         Func* fn = new Func($4 -> strValue);
         fn->argc = 0;
@@ -204,7 +208,11 @@
  ********************************************************************************/
 
 void yyerror(const char * s) {
-  fprintf(stderr,"%s", s);
+  #ifndef STRICT
+    fprintf(stderr,"%s\n", s);
+  #else
+    PANIC("%s\n", s);
+  #endif
 }
 
 void prompt() {

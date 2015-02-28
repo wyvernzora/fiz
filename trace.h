@@ -12,7 +12,7 @@
 
 #endif
 
-  #define PANIC(...) fprintf(stderr, __VA_ARGS__); exit(1);
+  #define PANIC(...) fprintf(stderr, __VA_ARGS__); exit(EXIT_FAILURE);
 
   #define WARN(...) fprintf(stderr, __VA_ARGS__);
 

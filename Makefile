@@ -1,12 +1,11 @@
 # Makefile for fiz
+CXX  = c++
 
-CC=gcc
-CXX=c++
+CFLAGS = -g
 
-CFLAGS= -g
-LEX=flex
-YACC=yacc
-LFL=-lfl
+LEX  = flex
+YACC = yacc
+LFL  = -lfl
 
 # OS detection, since -lfl on OS X is -ll
 UNAME_S := $(shell uname -s)
@@ -14,31 +13,21 @@ ifeq ($(UNAME_S),Darwin)
 	LFL = -ll
 endif
 
-
-all: fiz cleantmp test
-
-noclean: fiz test
-
-lex.yy.o: fiz.l y.tab.h
-	$(LEX) --outfile lex.yy.cc fiz.l
-	$(CXX) $(CFLAGS) -c lex.yy.cc
-
-y.tab.o: fiz.y
-	$(YACC) -d fiz.y
-	$(CXX) $(CFLAGS) -c y.tab.c
-
-cfiles:
-	$(CXX) $(CFLAGS) -c func.cc
-	$(CXX) $(CFLAGS) -c ast.cc
-
-fiz: y.tab.o lex.yy.o cfiles
-	$(CXX) -o fiz lex.yy.o y.tab.o func.o ast.o $(LFL)
-
-test: fiz
-	-mocha --reporter nyan
-
-cleantmp:
-	rm -f lex.yy.cc y.tab.cc y.tab.hh *.o
-
-clean: cleantmp
+all:   fiz
+fiz:   y.tab.o lex.yy.o func.o ast.o
+	$(CXX) -o fiz *.o $(LFL)
+test:  fiz
+	mocha --reporter nyan
+force: clean fiz
+clean:
+	rm -f *.yy.* *.tab.* *.o
 	rm -f fiz
+
+%.o:      %.cc
+	$(CXX) $(CFLAGS) -c $^
+y.tab.o:  fiz.y
+	$(YACC) -d fiz.y
+	$(CXX) $(CFLAGS) -x c++ -c y.tab.c
+lex.yy.o: fiz.l y.tab.h
+	$(LEX) fiz.l
+	$(CXX) $(CFLAGS) -x c++ -c lex.yy.c
