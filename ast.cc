@@ -1,129 +1,117 @@
-#include "global.h"
-#include "trace.h"
+// ------------------------------------------------------------------------- //
+//                                                                           //
+// CS252 Lab02 - FIZ Interpreter                                             //
+// Copyright © 2015 Denis Luchkin-Zhou                                       //
+//                                                                           //
+// ast.c                                                                     //
+// This file contains the logic of abstract syntax tree nodes.               //
+//                                                                           //
+// ------------------------------------------------------------------------- //
 #include "func.h"
 #include "ast.h"
 
-AstNode::AstNode(NodeType t) {
-  type  = t;
-  argc  = 0;
+
+// ========================================================================= //
+// Abstract base class for all AST nodes.                                    //
+// ========================================================================= //
+
+// Resolve: no-op.
+void AstNode::resolve(Func *fn)   { }
+
+// Evaluate: no-op.
+int  AstNode::eval(int *env)      { return 0; }
+
+
+// ========================================================================= //
+// Number: represents a positive integer value as entered into the FIZ.      //
+// ========================================================================= //
+
+// Constructor: takes the value of the number.
+NumNode::NumNode(int value)  { this -> value = value; }
+
+// Resolve: no-op.
+void NumNode::resolve(Func *fn)   { }
+
+// Evaluate: returns the value.
+int  NumNode::eval(int* env)      { return value; }
+
+
+// ========================================================================= //
+// Variable: an identifier that refers to an integer value.                  //
+// ========================================================================= //
+
+// Constructor: takes the name of the variable.
+VariableNode::VariableNode(char* name) {
+  this -> name = name;
   index = -1;
 }
 
-AstNode::~AstNode(void) {
-  switch (type) {
+// Destructor
+VariableNode::~VariableNode()     { free(name); }
 
-    // LEAF: Identifier
-    case ID_NODE: {
-      TRACE("del ID_NODE [%s]\n", strValue);
-      delete strValue; // Delete the identifier name
-    }
-    break;
+// Resolve: finds the index of the variable in the function argument list.
+void VariableNode::resolve(Func *fn) {
+  UserFunc *ufn = (UserFunc*)fn;
 
-    // LEAF: Number
-    case NUMBER_NODE: {
-      TRACE("del NUMBER_NODE [%d]\n", intValue);
-    }
-    break;
+  // if function definition is NULL, this variable shouldn't be here
+  if (!fn) { throw FIZ_SYNTAX_ERROR; }
 
-    case LIST_NODE: {
-      TRACE("del LIST_NODE [%d]\n", argc);
-      // Delete list contents
-      for (int i = 0; i < argc; i++) { delete argv[i]; }
+  // Look for the matching variable name
+  int i    = 0,
+      argc = ufn -> args -> size();
+  for (; i < argc; i++) {
+    if (!strcmp(ufn -> args -> at(i), name)) {
+      index = i;
+      break;
     }
-    break;
+  }
 
-    case FCALL_NODE: {
-      TRACE("del FCALL_NODE [%s]\n", argv[0]->strValue);
-      delete argv[0]; // Delete function name
-      delete argv[1]; // Delete function arguments
-    }
-    break;
+  // If still not found, the variable is undefined. panic.
+  if (index < 0) { throw FIZ_UNDEF_VAR; }
+}
+
+// Evaluate: return the corresponding value from function argument list.
+int  VariableNode::eval(int *env) { return env[index]; }
+
+
+// ========================================================================= //
+// Function Call: represents a function call with its arguments.             //
+// ========================================================================= //
+
+// Constructor: takes the name of the function and the list of arguments.
+// Argument list can be NULL, in which case an empty one is created.
+FcallNode::FcallNode(char *n, NodeList *args) {
+  name = n;
+  func = NULL;
+  argv = args ? args : new NodeList();
+}
+
+// Destructor
+FcallNode::~FcallNode() {
+  free(name);
+  while (!argv -> empty()) {
+    AstNode *arg = argv -> front();
+    argv -> pop_front();
+    delete arg;
+  }
+  delete argv;
+}
+
+// Resolve: resolves all function arguments.
+void FcallNode::resolve(Func *fn) {
+  NodeList::iterator it = argv -> begin();
+  for (; it != argv -> end(); ++it) {
+    (*it) -> resolve(fn);
   }
 }
 
-void
-AstNode::pushArg(AstNode *arg) {
-  if (argc >= MAX_ARGUMENTS) {
-    PANIC("Number of arguments exceeds %d.\n", MAX_ARGUMENTS);
-  }
-  argv[argc++] = arg;
-}
-
-int
-AstNode::resolve(Func *fn) {
-  switch (type) {
-
-    case FCALL_NODE: {
-      AstNode  *args   = argv[1];
-
-      // Resolve arguments
-      for (int i = 0; i < args -> argc; i++)
-        if (!args -> argv[i] -> resolve(fn)) return 0;
-
-      return 1;
-    }
-
-    case ID_NODE: {
-      int   index = -1;
-      char *name  = strValue;
-
-      // Find the argument if there is a custom function
-      if (fn) {
-        for (int i = 0; i < fn->argc; i++) {
-          if (!strcmp(fn->argv[i], name)) {
-            index = i;
-            break;
-          }
-        }
-      }
-
-      // Variable not found.. sad panda (Ｔ▽Ｔ)
-      if (index < 0) {
-        #ifndef STRICT
-          WARN("Variable '%s' is undefined.\n", name);
-          return 0;
-        #else
-          PANIC("Variable '%s' is undefined.\n", name);
-        #endif
-      }
-
-      this->index = index;
-      return 1;
-    }
-
-    default: return 1;
-  }
-}
-
-int
-AstNode::eval(int* env) {
-  switch (type) {
-
-    case NUMBER_NODE: return intValue;
-
-    case ID_NODE: return env[index];
-
-    case FCALL_NODE: {
-      char      *name =      argv[0]->strValue;
-      int        count =     argv[1]->argc;
-      AstNode  **arguments = argv[1]->argv;
-
-      Func* fn = functions -> find(name);
-      if (!fn) {
-        PANIC("Function '%s' is undefined.\n", argv[0] -> strValue);
-      }
-      func = fn;
-
-      // Check the number of args
-      if (count != fn -> argc) {
-        PANIC("%s expects %d argument%s but got %d.\n",
-          fn->name, fn->argc, (fn->argc == 1 ? "" : "s"), count);
-      }
-
-      return func -> call(arguments, count, env);
-    }
-
-    default: PANIC("Unexpected node type during evaluation.\n");
-
-  }
+// Evaluate: find the function and call it.
+int  FcallNode::eval(int *env) {
+  // (Lazy) Find the function
+  if (!func) { func = FuncRegistry::find(name); }
+  // Check for errors
+  if (!func) { throw FIZ_UNDEF_FUNC; }
+  if (argv -> size() != func -> argc) { throw FIZ_ARGNUM; }
+  // Call the function
+  return func -> call(argv, env);
 }

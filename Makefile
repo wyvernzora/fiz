@@ -14,7 +14,7 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 all:   fiz
-fiz:   y.tab.o lex.yy.o func.o ast.o
+fiz:   y.tab.o lex.yy.o func.o ast.o parser.o fiz.o
 	$(CXX) -o fiz *.o $(LFL)
 test:  fiz
 	mocha --reporter nyan

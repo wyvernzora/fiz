@@ -64,11 +64,11 @@ describe '(inc exp)', ->
 
   it 'should panic when there are no arguments', (done) ->
     script = '(inc)'
-    run '-n -v', script, null, 'INC expects 1 argument but got 0.', done
+    run '-n -v', script, null, '[904]', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(inc 0 0)'
-    run '-n -v', script, null, 'INC expects 1 argument but got 2.', done
+    run '-n -v', script, null, '[904]', done
 
 describe '(dec exp)', ->
 
@@ -82,15 +82,15 @@ describe '(dec exp)', ->
 
   it 'should panic when attempting to (dec 0)', (done) ->
     script = '(dec 0)'
-    run '-n -v', script, null, 'Attempt to (dec 0).', done
+    run '-n -v', script, null, '[905]', done
 
   it 'should panic when there are no arguments', (done) ->
     script = '(dec)'
-    run '-n -v', script, null, 'DEC expects 1 argument but got 0.', done
+    run '-n -v', script, null, '[904]', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(dec 1 1)'
-    run '-n -v', script, null, 'DEC expects 1 argument but got 2.', done
+    run '-n -v', script, null, '[904]', done
 
 describe '(ifz exp0 exp1 exp2)', ->
 
@@ -104,31 +104,27 @@ describe '(ifz exp0 exp1 exp2)', ->
 
   it 'should panic when there are no arguments', (done) ->
     script = '(ifz)'
-    run '-n -v', script, null, 'IFZ expects 3 arguments but got 0.', done
+    run '-n -v', script, null, '[904]', done
 
   it 'should panic when there are too few arguments', (done) ->
     script = '(ifz 1 2)'
-    run '-n -v', script, null, 'IFZ expects 3 arguments but got 2.', done
+    run '-n -v', script, null, '[904]', done
 
   it 'should panic when there are too many arguments', (done) ->
     script = '(ifz 1 2 3 4)'
-    run '-n -v', script, null, 'IFZ expects 3 arguments but got 4.', done
+    run '-n -v', script, null, '[904]', done
 
 describe '(halt)', ->
 
   it 'should terminate program with "Halted." message', (done) ->
     script = '(halt)'
-    run '-n -v', script, null, 'Halted.', done
+    run '-n -v', script, null, '[906]', done
 
   it 'should return syntax error when there are arguments', (done) ->
     script = '(halt 0)'
-    run '-n -v', script, null, 'HALT expects 0 arguments but got 1.', done
+    run '-n -v', script, null, '[904]', done
 
 describe '(define ...)', ->
-
-  it 'should correctly parse argument list', (done) ->
-    script = '(define (func a1 a2 a3 a4 a5) (inc 0))'
-    run '-n -v', script, 'func = func; args = [a1 a2 a3 a4 a5 ]', '', done
 
   it 'should correctly handle definition of up to 1000 functions', (done) ->
     script = ''
@@ -142,25 +138,12 @@ describe '(define ...)', ->
     '''
     run '-n', script, '3', null, done
 
-  it 'should panic when defining function with no arguments', (done) ->
-    script = '(define (func) (inc 0))'
-    run '-n -v', script, null, 'Function definitions without arguments are not allowed.', done
-
-  it 'should panic when the number of defined functions exceeds 1000', (done) ->
-    script = ''
-    script += "(define (f#{i} a b) (inc 0))\n" for i in [0..1000]
-    run '-n -v', script, null, 'Number of defined functions exceeds 1000.', done
-
   it 'should panic when redefining an existing function', (done) ->
     script = '''
     (define (func a1) (inc 998))
     (define (func a1 a2) (dec 998))
     '''
-    run '-n -v', script, null, 'Function \'func\' already defined.', done
-
-  it 'should panic when function is defined with more than 10 arguments', (done) ->
-    script = '(define (func a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11))'
-    run '-n -v', script, null, 'Number of arguments exceeds 10.', done
+    run '-n -v', script, null, '[902]', done
 
 describe '(func ...)', ->
 
@@ -169,7 +152,7 @@ describe '(func ...)', ->
     (define (func a1) (inc 998))
     (func 0)
     '''
-    run '-n -v', script, 'func = func; args = [a1 ]\n999', '', done
+    run '-n -v', script, '999', '', done
 
   it 'should correctly recognize variables within user-dfined functions', (done) ->
     script = '''
@@ -188,36 +171,29 @@ describe '(func ...)', ->
 
   it 'should panic when calling an undefined function', (done) ->
     script = '(func 0)'
-    run '-n -v', script, null, 'Function \'func\' is undefined.', done
+    run '-n -v', script, null, '[903]', done
 
   it 'should panic when attempting to use an undefined variable', (done) ->
     script = '''
     (define (func a b) (inc x))
     (func 0 1)
     '''
-    run '-n -v', script, null, 'Variable \'x\' is undefined.', done
+    run '-n -v', script, null, '[907]', done
 
   it 'should panic when function is called with less arguments than expected', (done) ->
     script = '''
     (define (func a b) (inc a))
     (func 1)
     '''
-    run '-n -v', script, null, 'func expects 2 arguments but got 1', done
+    run '-n -v', script, null, '[904]', done
 
   it 'should panic when function is called with more arguments that expected', (done) ->
     script = '''
     (define (func a b) (inc a))
     (func 0 1 2)
     '''
-    run '-n -v', script, null, 'func expects 2 arguments but got 3', done
+    run '-n -v', script, null, '[904]', done
 
-  it 'should panic when function is called with more than 10 arguments', (done) ->
-    script = '''
-    (define (func a0 a1 a2 a3 a4 a5 a6 a7 a8a a9 a10) (inc 0))
-    (func 1 2 3 4 5 6 7 8 9 10)
-    '''
-    run '-n', script, null, 'Number of arguments exceeds 10.', done
-    
 describe 'Test cases from the lab assignment', ->
 
   it '(inc (inc 5)) should result in 7', (done) ->
@@ -239,15 +215,15 @@ describe 'Test cases from the lab assignment', ->
 
   it '(inc 4 5) should return syntax error', (done) ->
     script = '(inc 4 5)'
-    run '-n -v', script, null, 'INC expects 1 argument but got 2.', done
+    run '-n -v', script, null, '[904]', done
 
   it '(ifz 0 halt) should return syntax error', (done) ->
     script = '(ifz 0 halt)'
-    run '-n -v', script, null, 'Variable \'halt\' is undefined.', done
+    run '-n -v', script, null, '[907]', done
 
   it '(inc (dec )) should return syntax error', (done) ->
     script = '(inc (dec ))'
-    run '-n -v', script, null, 'DEC expects 1 argument but got 0.', done
+    run '-n -v', script, null, '[904]', done
 
   it 'user-defined and recursive function', (done) ->
     script = '''

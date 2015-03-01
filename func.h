@@ -1,76 +1,96 @@
-// ========================================================================= //
+// ------------------------------------------------------------------------- //
 //                                                                           //
-// FIZ Interpreter                                                           //
-// Author: Denis Luchkin-Zhou                                                //
+// CS252 Lab02 - FIZ Interpreter                                             //
+// Copyright © 2015 Denis Luchkin-Zhou                                       //
 //                                                                           //
-// ========================================================================= //
+// func.h                                                                    //
+// This file contains definitions for FIZ function structures, FIZ function  //
+// registry and builtin functions.                                           //
+//                                                                           //
+// ------------------------------------------------------------------------- //
+#include <map>
 #include "ast.h"
 
 #ifndef FUNC_H
 #define FUNC_H
 
-// Maximum number of function definitions the interpreter allow
-#define MAX_FUNCTIONS 1000
-#define BUILTIN_FUNCTIONS 4
+// ------------------------------------------------------------------------- //
+// Shorthand for builtin function handler.                                   //
+// ------------------------------------------------------------------------- //
+typedef int (*BuiltInFunc)(NodeList*, int*);
 
-// Builtin function signature
-typedef int (*BuiltInFunc)(AstNode**, int, int*);
-
-// FIZ-scripted Function
+// ------------------------------------------------------------------------- //
+// Base class for function definitions.                                      //
+// ------------------------------------------------------------------------- //
 class Func {
+protected:
 public:
-  int               argc;
-  char             *name;
-  char             *argv[MAX_ARGUMENTS];  // Argument name list
-  AstNode          *body;                 // Body of the function (expr)
+  int               argc;              // Number of arguments
+  char             *name;              // Name of the function
 
-  Func();
-  Func(char*);
-  ~Func(void);
-
-  virtual int call(AstNode**, int, int*);
+  virtual int call(NodeList*, int*);   // Calls the function and returns result
 };
 
-// Native Function
+// ------------------------------------------------------------------------- //
+// FIZ-scripted function definition.                                         //
+// ------------------------------------------------------------------------- //
+class UserFunc : public Func {
+public:
+  IdList           *args;              // Argument name list
+  AstNode          *body;              // Body of the function (expr)
+
+  UserFunc(char*, IdList*, AstNode*);  // Constructor
+  ~UserFunc();                         // Destructor
+
+  virtual int call(NodeList*, int*);   // Calls the function
+};
+
+// ------------------------------------------------------------------------- //
+// Native function interface for FIZ scripts.                                //
+// ------------------------------------------------------------------------- //
 class NativeFunc : public Func {
 private:
-  int (*native)(AstNode**, int, int*);
+  BuiltInFunc native;                  // Pointer to function handler
 public:
-  NativeFunc(const char*, int, BuiltInFunc);
-  ~NativeFunc(void);
 
-  int call(AstNode**, int, int*);
+  NativeFunc(const char*, int,         // Constructor. Takes a name, number of
+             BuiltInFunc);             // arguments and a pointer to handler
+
+  int call(NodeList*, int*);           // Calls the function
 };
 
-// Function Registry
-class BST {
-public:
-  char    *key;
-  Func    *value;
-  BST     *lnode;
-  BST     *rnode;
 
-  BST(Func*);
-  int insert(BST*);
-  BST* find(const char*);
+// ------------------------------------------------------------------------- //
+// Comparator for builtin command map.                                       //
+// ------------------------------------------------------------------------- //
+struct StringComp :
+  public std::binary_function<const char*, const char*, bool> {
+    bool operator()(char const *a, char const *b) const {
+      return strcmp(a, b) < 0;
+    }
 };
 
+// ------------------------------------------------------------------------- //
+// Shorthand for the function map.                                           //
+// ------------------------------------------------------------------------- //
+typedef std::map<char*, Func*, StringComp> FuncMap;
+
+// ------------------------------------------------------------------------- //
+// Registry that maps function names to definitions.                         //
+// ------------------------------------------------------------------------- //
 class FuncRegistry {
 private:
-  int      count;
-  BST     *root;
+  static FuncMap  map;                 // Map
 public:
-  Func    *temp;
-  
-  FuncRegistry(void) : count(0), root(NULL) { };
-  int   reg(Func*);
-  Func* find(const char*);
+  static void  init();                 // Init. Adds builtin functnions
+  static bool  reg(Func*);             // Registers a function.
+  static Func* find(char*);            // Looks for a function by name.
 };
 
 // BUILTIN FUNCTIONS
-int fiz_inc(AstNode**, int, int*);
-int fiz_dec(AstNode**, int, int*);
-int fiz_ifz(AstNode**, int, int*);
-int fiz_halt(AstNode**, int, int*);
+int fiz_inc(NodeList*, int*);          // (inc x)
+int fiz_dec(NodeList*, int*);          // (dec x)
+int fiz_ifz(NodeList*, int*);          // (ifz x y z)
+int fiz_hlt(NodeList*, int*);          // (halt)
 
 #endif

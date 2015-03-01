@@ -1,54 +1,83 @@
-// ========================================================================= //
+// ------------------------------------------------------------------------- //
 //                                                                           //
-// FIZ Interpreter                                                           //
-// Author: Denis Luchkin-Zhou                                                //
+// CS252 Lab02 - FIZ Interpreter                                             //
+// Copyright © 2015 Denis Luchkin-Zhou                                       //
 //                                                                           //
-// ========================================================================= //
+// ast.h                                                                     //
+// This file contains definitions of abstract syntax tree node definitions.  //
+//                                                                           //
+// ------------------------------------------------------------------------- //
+#include <deque>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "fiz.h"
 
 #ifndef AST_H
 #define AST_H
 
-// Maximum number of arguments a function can have
-#define MAX_ARGUMENTS 10
-
-// Forward declaration of Func type
+// Forward declaration
 class Func;
 
-// AST Node Types
-typedef enum {
-  LIST_NODE,   // corresponds to a list of random stuff
-  ID_NODE,     // corresponds to an identifier
-  FCALL_NODE,  // corresponds to a function call
-  NUMBER_NODE
-} NodeType;
-
-// AST Node
+// ------------------------------------------------------------------------- //
+// Abstract base class for all AST nodes.                                    //
+// ------------------------------------------------------------------------- //
 class AstNode {
 public:
+  virtual void resolve(Func*);         // Resolves the given node
+  virtual int  eval(int*);             // Evaluates the given node and returns
+                                       // the result.
+};
 
-  NodeType      type;                 // Node type
-  int           argc;                 // Number of arguments
+// ------------------------------------------------------------------------- //
+// Number: represents a positive integer value as entered into the FIZ.      //
+// ------------------------------------------------------------------------- //
+class NumNode : public AstNode {
+public:
+  int  value;                          // Value of the number node.
 
-  union {
-    int         index;                // Variable index
-    Func*       func;                 // Function reference
-  };
+  NumNode(int);                        // Constructor.
 
-  union {
-    AstNode    *argv[MAX_ARGUMENTS];  // All arguments
-    char       *strValue;             // For ID_NODE
-    int         intValue;             // For NUMBER_NODE
-  };
+  void resolve(Func*);                 // No-op for this class.
+  int  eval(int*);                     // Returns the value of the number node.
+};
 
-  AstNode(NodeType);
-  ~AstNode(void);
+// ------------------------------------------------------------------------- //
+// Shorthands for commonly used lists.                                       //
+// ------------------------------------------------------------------------- //
+typedef std::deque<AstNode*> NodeList;
+typedef std::deque<char*>    IdList;
 
-  void pushArg(AstNode*);
-  int resolve(Func*);
-  int eval(int*);
+// ------------------------------------------------------------------------- //
+// Variable: an identifier that refers to an integer value.                  //
+// ------------------------------------------------------------------------- //
+class VariableNode : public AstNode {
+public:
+  char *name;                          // Name of the variable
+  int   index;                         // Index of the variable in arg list
+
+  VariableNode(char*);                 // Constructor.
+  ~VariableNode();                     // Destructor.
+
+  void resolve(Func*);                 // Finds the index of variable.
+  int  eval(int*);                     // Fetches the value of the variable.
+};
+
+// ------------------------------------------------------------------------- //
+// Function Call: represents a function call with its arguments.             //
+// ------------------------------------------------------------------------- //
+class FcallNode : public AstNode {
+public:
+  char      *name;                     // Name of the function that is called
+  Func      *func;                     // The resolved function definition
+  NodeList  *argv;                     // List of arguments for the function
+
+  FcallNode(char*, NodeList*);         // Constructor.
+  ~FcallNode();                        // Destructor.
+
+  void resolve(Func*);                 // Resolves all argument nodes.
+  int  eval(int*);                     // Evaluates the function and returns
+                                       // result of evaluation.
 };
 
 #endif
