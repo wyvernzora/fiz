@@ -24,7 +24,7 @@ FuncMap FuncRegistry::map;
 // ========================================================================= //
 
 // Call: no-op.
-int Func::call(NodeList *args, int *context) { }
+int Func::call(NodeList *args, int *context) { return 0; }
 
 
 // ========================================================================= //

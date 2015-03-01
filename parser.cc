@@ -8,6 +8,7 @@
 // functions that take care of building the AST.                             //
 //                                                                           //
 // ------------------------------------------------------------------------- //
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,6 +17,33 @@
 #include "func.h"
 #include "parser.h"
 
+PromptHandler Parser::_prompt;
+OutputHandler Parser::_output;
+
+void Parser::prompt() {
+  if (isatty(fileno(yyin)) && Parser::_prompt) { (*Parser::_prompt)(); }
+}
+
+void Parser::output(int i) {
+  if (Parser::_output) { (*Parser::_output)(i); }
+}
+
+// ------------------------------------------------------------------------- //
+// Initializes the parser to read from the file descriptor.                  //
+// ------------------------------------------------------------------------- //
+void Parser::setInput(int fd) {
+  if (yyin) { fclose(yyin); }
+  yyin = fdopen(fd, "r");
+}
+
+// ------------------------------------------------------------------------- //
+// Retruns a flag indicating whether a prompt should be printed.             //
+// ------------------------------------------------------------------------- //
+int  Parser::getInput() { return fileno(yyin); }
+
+void Parser::setPrompt(PromptHandler handler) { Parser::_prompt = handler; }
+
+void Parser::setOutput(OutputHandler handler) { Parser::_output = handler; }
 
 // ------------------------------------------------------------------------- //
 // Defines a FIZ-scripted function.                                          //
@@ -29,6 +57,8 @@ void Parser::define(char *name, IdList *args, AstNode *body) {
   }
   // Resolve the function
   fn -> body -> resolve(fn);
+  // Prompt for next
+  Parser::prompt();
 }
 
 // ------------------------------------------------------------------------- //
@@ -38,6 +68,10 @@ int Parser::execute(AstNode *expr) {
   expr -> resolve(NULL);
   int i = expr -> eval(NULL);
   delete expr;
+
+  Parser::output(i);
+  Parser::prompt();
+
   return i;
 }
 

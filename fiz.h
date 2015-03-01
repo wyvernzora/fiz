@@ -11,6 +11,8 @@
 #ifndef FIZ_H_
 #define FIZ_H_
 
+#define OUT_BUFFER_SIZE 16
+
 // ------------------------------------------------------------------------- //
 // FIZ error struct.                                                         //
 // ------------------------------------------------------------------------- //
@@ -56,18 +58,39 @@ int  yylex();
 void yyerror(const char*);
 
 // ------------------------------------------------------------------------- //
-// Prints an input prompt (only when in TTY mode).                           //
-// ------------------------------------------------------------------------- //
-void prompt(void);
-
-// ------------------------------------------------------------------------- //
-// Outputs the result of a signle FIZ statement.                             //
-// ------------------------------------------------------------------------- //
-void output(int);
-
-// ------------------------------------------------------------------------- //
 // YACC parse function definition.                                           //
 // ------------------------------------------------------------------------- //
 int yyparse(void);
+
+// ------------------------------------------------------------------------- //
+// Public FIZ parser API.                                                    //
+// ------------------------------------------------------------------------- //
+class Fiz {
+private:
+  char *_prompt;                       // Prompt string (when input is TTY).
+  int   _out_sz;                       // FIZ output buffer capacity.
+  int  *_out_pt;                       // FIZ output buffer.
+  int  *_out_wr;                       // FIZ output write pointer.
+  int  *_out_rd;                       // FIZ output read pointer.
+
+  int   _pipe[2];                      // Builtin pipe if no input supplied.
+
+  void  _prompt();
+  void  _output(int);
+
+public:
+
+  Fiz();                               // New FIZ instance using builtin pipes.
+  Fiz(int);                            // New FIZ instance that reads from fd.
+  ~Fiz();
+
+  // Interpreter I/O
+  int  write(char*);
+  int  write(char*, int);
+  int  read(int*, int);
+
+  // Setup
+  void setPrompt(const char*);
+};
 
 #endif

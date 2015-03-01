@@ -37,8 +37,8 @@ statements:
   statement | statement statements;
 
 statement:
-  OP DEF OP ID idlist CP expr CP  { Parser::define($4, $5, $7);   prompt(); } |
-  expr                            { output(Parser::execute($1));  prompt(); } ;
+  OP DEF OP ID idlist CP expr CP  { Parser::define($4, $5, $7);             } |
+  expr                            { Parser::execute($1);                    } ;
 
 idlist:
   ID idlist                       { $$ = Parser::id_list($1,   $2);         } |
