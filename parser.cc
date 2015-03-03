@@ -38,8 +38,8 @@ void Parser::output(int i) {
 // Initializes the parser to read from the file descriptor.                  //
 // ------------------------------------------------------------------------- //
 void Parser::setInput(int fd) {
-  if (fizin) { fclose(fizin); }
-  fizin = fdopen(fd, "r");
+  //if (fizin) { fclose(fizin); }
+  fizrestart(fdopen(fd, "r"));
 }
 
 // ------------------------------------------------------------------------- //
@@ -63,8 +63,6 @@ void Parser::define(char *name, IdList *args, AstNode *body) {
   }
   // Resolve the function
   fn -> body -> resolve(fn);
-  // Prompt for next
-  Parser::prompt();
 }
 
 // ------------------------------------------------------------------------- //
@@ -76,7 +74,6 @@ int Parser::execute(AstNode *expr) {
   delete expr;
 
   Parser::output(i);
-  Parser::prompt();
 
   return i;
 }

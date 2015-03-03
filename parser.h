@@ -37,7 +37,8 @@ void fizerror(const char*);
 // ------------------------------------------------------------------------- //
 // YACC parse function definition.                                           //
 // ------------------------------------------------------------------------- //
-int fizparse(void);
+void fizrestart(FILE*);
+int  fizparse(void);
 
 class Parser {
 private:

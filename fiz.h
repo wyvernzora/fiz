@@ -61,7 +61,7 @@ class Fiz {
 private:
   static bool            _init;        // Indicates whether FIZ is initialized.
   static std::deque<int> _output;      // Output buffer. Sort of.
-
+  
   static void  output(int);            // Internal output function.
 
 public:
