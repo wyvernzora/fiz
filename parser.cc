@@ -20,6 +20,11 @@
 PromptHandler Parser::_prompt;
 OutputHandler Parser::_output;
 
+// ------------------------------------------------------------------------- //
+// Handles the YACC errors.                                                  //
+// ------------------------------------------------------------------------- //
+void yyerror(const char * s) { throw FIZ_SYNTAX_ERROR; }
+
 void Parser::prompt() {
   if (isatty(fileno(yyin)) && Parser::_prompt) { (*Parser::_prompt)(); }
 }

@@ -11,7 +11,7 @@
 #ifndef FIZ_H_
 #define FIZ_H_
 
-#define OUT_BUFFER_SIZE 16
+#include <deque>
 
 // ------------------------------------------------------------------------- //
 // FIZ error struct.                                                         //
@@ -46,51 +46,33 @@ typedef struct FIZ_ERR {
 #define FIZ_DEC_ZERO         FIZ_ERR(905, "Attempt to (dec 0).")
 #define FIZ_HALT             FIZ_ERR(906, "Halted.")
 #define FIZ_UNDEF_VAR        FIZ_ERR(907, "Variable is not defined.")
+#define FIZ_PIPE_FAIL        FIZ_ERR(908, "Pipe creation failed.")
+
 
 // ------------------------------------------------------------------------- //
-// Called to start the YACC parsing process.                                 //
+// FIZ Interactive Prompt Handler.                                           //
 // ------------------------------------------------------------------------- //
-int  yylex();
-
-// ------------------------------------------------------------------------- //
-// Handles the YACC errors.                                                  //
-// ------------------------------------------------------------------------- //
-void yyerror(const char*);
-
-// ------------------------------------------------------------------------- //
-// YACC parse function definition.                                           //
-// ------------------------------------------------------------------------- //
-int yyparse(void);
+typedef void (*PromptHandler)(void);
 
 // ------------------------------------------------------------------------- //
 // Public FIZ parser API.                                                    //
 // ------------------------------------------------------------------------- //
 class Fiz {
 private:
-  char *_prompt;                       // Prompt string (when input is TTY).
-  int   _out_sz;                       // FIZ output buffer capacity.
-  int  *_out_pt;                       // FIZ output buffer.
-  int  *_out_wr;                       // FIZ output write pointer.
-  int  *_out_rd;                       // FIZ output read pointer.
+  static bool            _init;        // Indicates whether FIZ is initialized.
+  static std::deque<int> _output;      // Output buffer. Sort of.
 
-  int   _pipe[2];                      // Builtin pipe if no input supplied.
-
-  void  _prompt();
-  void  _output(int);
+  static void  output(int);            // Internal output function.
 
 public:
 
   Fiz();                               // New FIZ instance using builtin pipes.
-  Fiz(int);                            // New FIZ instance that reads from fd.
-  ~Fiz();
+  ~Fiz();                              // Destructor.
 
   // Interpreter I/O
-  int  write(char*);
-  int  write(char*, int);
-  int  read(int*, int);
-
-  // Setup
-  void setPrompt(const char*);
+  int  eval(const char*);              // Evaluates script.
+  int  eval(const char*, int);         // Evaluates script.
+  int  read(int*, int);                // Reads script output.
 };
 
 #endif

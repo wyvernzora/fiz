@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "parser.h"
 #include "fiz.h"
 
 #ifndef AST_H
@@ -28,6 +29,8 @@ public:
   virtual int  eval(int*);             // Evaluates the given node and returns
                                        // the result.
 };
+typedef std::deque<AstNode*> NodeList;
+typedef std::deque<char*>    IdList;
 
 // ------------------------------------------------------------------------- //
 // Number: represents a positive integer value as entered into the FIZ.      //
@@ -41,12 +44,6 @@ public:
   void resolve(Func*);                 // No-op for this class.
   int  eval(int*);                     // Returns the value of the number node.
 };
-
-// ------------------------------------------------------------------------- //
-// Shorthands for commonly used lists.                                       //
-// ------------------------------------------------------------------------- //
-typedef std::deque<AstNode*> NodeList;
-typedef std::deque<char*>    IdList;
 
 // ------------------------------------------------------------------------- //
 // Variable: an identifier that refers to an integer value.                  //
@@ -79,5 +76,7 @@ public:
   int  eval(int*);                     // Evaluates the function and returns
                                        // result of evaluation.
 };
+
+
 
 #endif

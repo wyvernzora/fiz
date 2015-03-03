@@ -1,4 +1,5 @@
 fiz
+libfiz.a
 !fiz.*
 !Makefile
 *.o

@@ -14,14 +14,17 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 all:   fiz
-fiz:   y.tab.o lex.yy.o main.o func.o ast.o parser.o fiz.o
-	$(CXX) -o fiz *.o $(LFL)
+fiz:   main.o libfiz.a
+	$(CXX) -o fiz main.o libfiz.a $(LFL)
 test:  fiz
 	mocha --reporter nyan
 force: clean fiz
 clean:
 	rm -f *.yy.* *.tab.* *.o
-	rm -f fiz
+	rm -f fiz libfiz.a
+
+libfiz.a: y.tab.o lex.yy.o func.o ast.o parser.o fiz.o
+	ar rvs libfiz.a y.tab.o lex.yy.o func.o ast.o parser.o fiz.o
 
 %.o:      %.cc
 	$(CXX) $(CFLAGS) -c $^

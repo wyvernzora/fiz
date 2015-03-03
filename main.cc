@@ -34,15 +34,9 @@ void output(int i) { printf("%d\n", i); }
 // ------------------------------------------------------------------------- //
 int main(int argc, char *argv[]) {
 
-  int fdpipe[2];
-  pipe(fdpipe);
-
-  write(fdpipe[1], "(inc (dec 999))", 15);
-  close(fdpipe[1]);
-
   // Initialize
   FuncRegistry::init();
-  Parser::setInput(fdpipe[0]);
+  Parser::setInput(0);
   Parser::setOutput(&output);
   Parser::setPrompt(&prompt);
 
@@ -50,10 +44,10 @@ int main(int argc, char *argv[]) {
   try {
     Parser::prompt();
     yyparse();
-    close(fdpipe[0]);
   }
   catch (FizError err) {
     fprintf(stderr, "[%d] %s\n", FIZ_ERRNO(err), FIZ_STRERR(err));
+    return 1;
   }
 
   return 0;

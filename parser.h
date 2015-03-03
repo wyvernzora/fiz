@@ -18,16 +18,33 @@
 
 extern FILE *yyin;
 
+// ------------------------------------------------------------------------- //
+// Shorthands for commonly used long type names.                             //
+// ------------------------------------------------------------------------- //
 typedef void (*PromptHandler)(void);
 typedef void (*OutputHandler)(int);
 
+// ------------------------------------------------------------------------- //
+// Called to start the YACC parsing process.                                 //
+// ------------------------------------------------------------------------- //
+int  yylex();
+
+// ------------------------------------------------------------------------- //
+// Handles the YACC errors.                                                  //
+// ------------------------------------------------------------------------- //
+void yyerror(const char*);
+
+// ------------------------------------------------------------------------- //
+// YACC parse function definition.                                           //
+// ------------------------------------------------------------------------- //
+int yyparse(void);
+
 class Parser {
 private:
-  ST PromptHandler _prompt;
-  ST OutputHandler _output;
+  ST PromptHandler _prompt;                    // Prompt handler.
+  ST OutputHandler _output;                    // Output handler.
 
-
-  ST void  output(int);
+  ST void  output(int);                        // Internal output handler.
 
 public:
   ST void  setInput(int);                      // Sets the parser input.

@@ -1,66 +1,0 @@
-
-
-  ;comments
-    ✓ should ignore comments on a separate line 
-    ✓ should ignore comments on the same line 
-    ✓ should ignore expression in the comments 
-
-  (inc exp)
-    ✓ should increase a number by 1 
-    ✓ should increase an expression by 1 
-    ✓ should panic when there are no arguments 
-    ✓ should panic when there are too many arguments 
-
-  (dec exp)
-    ✓ should decrease a number by 1 
-    ✓ should decrease an expression by 1 
-    ✓ should panic when attempting to (dec 0) 
-    ✓ should panic when there are no arguments 
-    ✓ should panic when there are too many arguments 
-
-  (ifz exp0 exp1 exp2)
-    ✓ should evaluate to exp1 when exp0 is not 0 
-    ✓ should evaluate to exp2 when exp0 is 0 
-    ✓ should panic when there are no arguments 
-    ✓ should panic when there are too few arguments 
-    ✓ should panic when there are too many arguments 
-
-  (halt)
-    ✓ should terminate program with "Halted." message 
-    ✓ should return syntax error when there are arguments 
-
-  (define ...)
-    ✓ should correctly parse argument list 
-    ✓ should correctly parse function definition without arguments 
-    ✓ should correctly handle definition of up to 1000 functions 
-    ✓ should correctly handle recursive definitions 
-    ✓ should panic when the number of defined functions exceeds 1000 
-    ✓ should panic when refefining an existing function 
-    ✓ should panic when function is defined with more than 10 arguments 
-
-  (func ...)
-    ✓ should correctly run a previously defined function 
-    ✓ should correctly recognize variables within user-dfined functions 
-    ✓ should correctly call a user-defined function from within a user-defined function 
-    ✓ should panic when calling an undefined function 
-    ✓ should panic when attempting to use an undefined variable 
-    ✓ should panic when function is called with less arguments than expected 
-    ✓ should panic when function is called with more arguments that expected 
-    ✓ should panic when function is called with more than 10 arguments 
-
-  Test cases from the lab assignment
-    ✓ (inc (inc 5)) should result in 7 
-    ✓ (dec (inc (dec 3))) should result in 2 
-    ✓ (dec (ifz 0 4 (inc 1))) should result in 3 
-    ✓ (ifz 1 (halt) 5) should result in 5 
-    ✓ (inc 4 5) should return syntax error 
-    ✓ (ifz 0 halt) should return syntax error 
-    ✓ (inc (dec )) should return syntax error 
-    ✓ user-defined and recursive function 
-
-  Regression testing for fixed issues
-    ✓ issue #1: variables within user-defined function definitions are reported as undefined 
-
-
-  43 passing (334ms)
-
