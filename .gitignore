@@ -3,6 +3,6 @@ libfiz.a
 !fiz.*
 !Makefile
 *.o
-*.yy.*
+lex.*
 *.tab.*
 node_modules

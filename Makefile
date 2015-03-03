@@ -20,17 +20,17 @@ test:  fiz
 	mocha --reporter nyan
 force: clean fiz
 clean:
-	rm -f *.yy.* *.tab.* *.o
+	rm -f lex.* *.tab.* *.o
 	rm -f fiz libfiz.a
 
-libfiz.a: y.tab.o lex.yy.o func.o ast.o parser.o fiz.o
-	ar rvs libfiz.a y.tab.o lex.yy.o func.o ast.o parser.o fiz.o
+libfiz.a: y.tab.o lex.fiz.o func.o ast.o parser.o fiz.o
+	ar rvs libfiz.a y.tab.o lex.fiz.o func.o ast.o parser.o fiz.o
 
 %.o:      %.cc
 	$(CXX) $(CFLAGS) -c $^
 y.tab.o:  fiz.y
-	$(YACC) -d fiz.y
+	$(YACC) -p fiz -d fiz.y
 	$(CXX) $(CFLAGS) -x c++ -c y.tab.c
-lex.yy.o: fiz.l y.tab.h
-	$(LEX) fiz.l
-	$(CXX) $(CFLAGS) -x c++ -c lex.yy.c
+lex.fiz.o: fiz.l y.tab.h
+	$(LEX) -P fiz fiz.l
+	$(CXX) $(CFLAGS) -x c++ -c lex.fiz.c

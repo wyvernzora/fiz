@@ -16,7 +16,7 @@
 
 #define ST static
 
-extern FILE *yyin;
+extern FILE *fizin;
 
 // ------------------------------------------------------------------------- //
 // Shorthands for commonly used long type names.                             //
@@ -27,17 +27,17 @@ typedef void (*OutputHandler)(int);
 // ------------------------------------------------------------------------- //
 // Called to start the YACC parsing process.                                 //
 // ------------------------------------------------------------------------- //
-int  yylex();
+int  fizlex();
 
 // ------------------------------------------------------------------------- //
 // Handles the YACC errors.                                                  //
 // ------------------------------------------------------------------------- //
-void yyerror(const char*);
+void fizerror(const char*);
 
 // ------------------------------------------------------------------------- //
 // YACC parse function definition.                                           //
 // ------------------------------------------------------------------------- //
-int yyparse(void);
+int fizparse(void);
 
 class Parser {
 private:

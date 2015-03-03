@@ -20,6 +20,8 @@
 int loading;
 %}
 
+%option noyywrap
+
 %x incl
 %%
 
@@ -28,16 +30,16 @@ int loading;
 <incl>[ \t]*                  {  }
 <incl>[^ \t\n]+               {
                                 // Open file, throw if failed
-                                yyin = fopen(yytext, "r");
-                                if (!yyin) { throw FIZ_INCLUDE_FAIL; }
+                                fizin = fopen(fiztext, "r");
+                                if (!fizin) { throw FIZ_INCLUDE_FAIL; }
                                 loading = 1;
 
                                 // Make parser process it
-                                yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
+                                fizpush_buffer_state(fiz_create_buffer(fizin, YY_BUF_SIZE));
                                 BEGIN(INITIAL);
                               }
 <<EOF>>                       {
-                                yypop_buffer_state();
+                                fizpop_buffer_state();
                                 loading = 0;
                                 if (!YY_CURRENT_BUFFER) { yyterminate(); }
                                 printf("\x1B[36mfiz> \x1B[0m");
@@ -46,7 +48,7 @@ int loading;
 "define"                      { return DEF; }
 
 [_a-zA-Z][_a-zA-Z0-9]*        {
-                                yylval.str_val = strdup(yytext);
+                                fizlval.str_val = strdup(fiztext);
                                 return ID;
                               }
 
@@ -55,7 +57,7 @@ int loading;
 ")"                           { return CP; }
 
 0|[1-9][0-9]*                 {
-                              	yylval.num_val = atoi(yytext);
+                                fizlval.num_val = atoi(fiztext);
                               	return NUM;
                               }
 

@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   // Parse the stream
   try {
     Parser::prompt();
-    yyparse();
+    fizparse();
   }
   catch (FizError err) {
     fprintf(stderr, "[%d] %s\n", FIZ_ERRNO(err), FIZ_STRERR(err));

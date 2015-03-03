@@ -61,7 +61,7 @@ int Fiz::eval(const char *script, int count) {
   close(_pipe[1]);
   // Set parser input and evaluate the expression
   Parser::setInput(_pipe[0]);
-  yyparse();
+  fizparse();
   close(_pipe[0]);
   // Return the number of newly inserted elements
   return _output.size() - before;

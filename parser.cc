@@ -23,10 +23,11 @@ OutputHandler Parser::_output;
 // ------------------------------------------------------------------------- //
 // Handles the YACC errors.                                                  //
 // ------------------------------------------------------------------------- //
-void yyerror(const char * s) { throw FIZ_SYNTAX_ERROR; }
+void fizerror(const char * s) { throw FIZ_SYNTAX_ERROR; }
+int  fizwrap() { return 1; }
 
 void Parser::prompt() {
-  if (isatty(fileno(yyin)) && Parser::_prompt) { (*Parser::_prompt)(); }
+  if (isatty(fileno(fizin)) && Parser::_prompt) { (*Parser::_prompt)(); }
 }
 
 void Parser::output(int i) {
@@ -37,14 +38,14 @@ void Parser::output(int i) {
 // Initializes the parser to read from the file descriptor.                  //
 // ------------------------------------------------------------------------- //
 void Parser::setInput(int fd) {
-  if (yyin) { fclose(yyin); }
-  yyin = fdopen(fd, "r");
+  if (fizin) { fclose(fizin); }
+  fizin = fdopen(fd, "r");
 }
 
 // ------------------------------------------------------------------------- //
 // Retruns a flag indicating whether a prompt should be printed.             //
 // ------------------------------------------------------------------------- //
-int  Parser::getInput() { return fileno(yyin); }
+int  Parser::getInput() { return fileno(fizin); }
 
 void Parser::setPrompt(PromptHandler handler) { Parser::_prompt = handler; }
 
