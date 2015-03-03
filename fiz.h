@@ -47,6 +47,7 @@ typedef struct FIZ_ERR {
 #define FIZ_HALT             FIZ_ERR(906, "Halted.")
 #define FIZ_UNDEF_VAR        FIZ_ERR(907, "Variable is not defined.")
 #define FIZ_PIPE_FAIL        FIZ_ERR(908, "Pipe creation failed.")
+#define FIZ_BAD_ENVAR        FIZ_ERR(909, "Environment variable value not supported.")
 
 
 // ------------------------------------------------------------------------- //
@@ -61,7 +62,7 @@ class Fiz {
 private:
   static bool            _init;        // Indicates whether FIZ is initialized.
   static std::deque<int> _output;      // Output buffer. Sort of.
-  
+
   static void  output(int);            // Internal output function.
 
 public:

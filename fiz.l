@@ -47,6 +47,11 @@ int loading;
 
 "define"                      { return DEF; }
 
+[$][_a-zA-Z][_a-zA-Z0-9]*     {
+                                fizlval.str_val = strdup(fiztext + 1);
+                                return XID;
+                              }
+
 [_a-zA-Z][_a-zA-Z0-9]*        {
                                 fizlval.str_val = strdup(fiztext);
                                 return ID;

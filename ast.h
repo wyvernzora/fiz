@@ -77,6 +77,21 @@ public:
                                        // result of evaluation.
 };
 
+// ------------------------------------------------------------------------- //
+// Environment Variable Node: an environment variable.                       //
+// ------------------------------------------------------------------------- //
+class EnvarNode : public AstNode {
+public:
+  char      *name;                     // Name of the environment variable.
+  int        value;                    // Value of the environment variable.
+
+  EnvarNode(char*);                    // Constructor.
+  ~EnvarNode();                        // Destructor.
+
+  void resolve(Func*);                 // Resolves variable to its value.
+  int  eval(int*);                     // Returns the value.
+
+};
 
 
 #endif

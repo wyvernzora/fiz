@@ -19,6 +19,7 @@
 
 %token <str_val>   ID
 %token <num_val>   NUM
+%token <str_val>   XID
 %type  <node_val>  expr
 %type  <node_list> exprs
 %type  <id_list>   idlist
@@ -47,6 +48,7 @@ idlist:
 expr:
   OP ID exprs CP                  { $$ = new FcallNode($2, $3);             } |
   ID                              { $$ = new VariableNode($1);              } |
+  XID                             { $$ = new EnvarNode($1);                 } |
   NUM                             { $$ = new NumNode($1);                   } ;
 
 exprs:
