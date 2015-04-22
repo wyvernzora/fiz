@@ -12,7 +12,7 @@
 #define PARSER_H_
 
 #include <vector>
-#include "ast/ast.h"
+#include "ast/node.h"
 
 #define ST static
 

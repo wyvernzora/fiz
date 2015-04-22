@@ -9,7 +9,12 @@
 // ------------------------------------------------------------------------- */
 
 %{
- #include "ast/ast.h"
+ #include "ast/node.h"
+ #include "ast/env.h"
+ #include "ast/fcall.h"
+ #include "ast/num.h"
+ #include "ast/var.h"
+ 
  #include "parser/parser.h"
 %}
 

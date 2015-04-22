@@ -13,9 +13,12 @@
 #include <stdio.h>
 
 #include "fiz/fiz.h"
-#include "ast/ast.h"
 #include "func/func.h"
 #include "parser/parser.h"
+
+
+#include "ast/node.h"
+
 
 PromptHandler Parser::_prompt;
 OutputHandler Parser::_output;

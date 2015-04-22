@@ -9,10 +9,15 @@
 //                                                                           //
 // ------------------------------------------------------------------------- //
 #include <map>
-#include "ast/ast.h"
+#include "ast/node.h"
 
 #ifndef FUNC_H
 #define FUNC_H
+
+class AstNode;
+
+typedef std::deque<AstNode*> NodeList;
+typedef std::deque<char*>    IdList;
 
 // ------------------------------------------------------------------------- //
 // Shorthand for builtin function handler.                                   //

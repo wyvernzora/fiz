@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ast/ast.h"
+#include "ast/node.h"
 #include "y.tab.h"
 #include "fiz/fiz.h"
 #include "parser/parser.h"

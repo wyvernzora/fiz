@@ -63,7 +63,6 @@ $(YACC_O): $(SDIR)/parser/fiz.y
 	@$(YACC) -p fiz -d $<
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CFLAGS) -x c++ -c y.tab.c -Iinc -Iinc/parser -I. -o $@
-	@rm -f *.tab.*
 	@printf "\033[1;32mDone!\033[0m\n"
 
 $(LEX_O): $(SDIR)/parser/fiz.l
@@ -71,7 +70,6 @@ $(LEX_O): $(SDIR)/parser/fiz.l
 	@$(LEX) -P fiz $<
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CFLAGS) -x c++ -c lex.fiz.c -Iinc -Iinc/parser -I. -o $@
-	@rm -f lex.fiz.c
 	@printf "\033[1;32mDone!\033[0m\n"
 
 
@@ -89,4 +87,5 @@ clean: clean-deps
 	@printf "Cleaning   %-25s" "binaries"...
 	@rm -rf $(ODIR) $(TDIR)
 	@rm -f $(OUT)
+	@rm -f *.tab.* lex.fiz.c
 	@printf "\033[1;32mDone!\033[0m\n"

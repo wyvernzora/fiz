@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fiz/fiz.h"
-#include "ast/ast.h"
+#include "ast/node.h"
 #include "func/func.h"
 
 // Forward declaration
