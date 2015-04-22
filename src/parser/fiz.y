@@ -9,8 +9,8 @@
 // ------------------------------------------------------------------------- */
 
 %{
- #include "ast.h"
- #include "parser.h"
+ #include "ast/ast.h"
+ #include "parser/parser.h"
 %}
 
 %token OP

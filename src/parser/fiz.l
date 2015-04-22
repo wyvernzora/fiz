@@ -12,10 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ast.h"
+#include "ast/ast.h"
 #include "y.tab.h"
-#include "fiz.h"
-#include "parser.h"
+#include "fiz/fiz.h"
+#include "parser/parser.h"
 
 int loading;
 %}

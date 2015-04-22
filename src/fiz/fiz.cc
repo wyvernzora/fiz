@@ -10,9 +10,9 @@
 // ------------------------------------------------------------------------- //
 #include <unistd.h>
 #include <stdio.h>
-#include "parser.h"
-#include "func.h"
-#include "fiz.h"
+#include "parser/parser.h"
+#include "func/func.h"
+#include "fiz/fiz.h"
 
 // Forward declarations
 bool            Fiz::_init;

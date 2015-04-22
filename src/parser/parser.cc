@@ -12,10 +12,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "fiz.h"
-#include "ast.h"
-#include "func.h"
-#include "parser.h"
+#include "fiz/fiz.h"
+#include "ast/ast.h"
+#include "func/func.h"
+#include "parser/parser.h"
 
 PromptHandler Parser::_prompt;
 OutputHandler Parser::_output;

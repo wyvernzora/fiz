@@ -9,7 +9,7 @@
 //                                                                           //
 // ------------------------------------------------------------------------- //
 #include <map>
-#include "ast.h"
+#include "ast/ast.h"
 
 #ifndef FUNC_H
 #define FUNC_H

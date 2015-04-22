@@ -12,9 +12,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "fiz.h"
-#include "func.h"
-#include "parser.h"
+#include "fiz/fiz.h"
+#include "func/func.h"
+#include "parser/parser.h"
 
 void prompt(void);
 void output(int);

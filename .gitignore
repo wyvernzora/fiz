@@ -1,8 +1,10 @@
-fiz
-libfiz.a
+./fiz
+./libfiz.a
 !fiz.*
 !Makefile
 *.o
 lex.*
 *.tab.*
 node_modules
+obj
+tmp

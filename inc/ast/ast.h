@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parser.h"
-#include "fiz.h"
+#include "parser/parser.h"
+#include "fiz/fiz.h"
 
 #ifndef AST_H
 #define AST_H

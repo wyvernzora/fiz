@@ -11,9 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "fiz.h"
-#include "ast.h"
-#include "func.h"
+#include "fiz/fiz.h"
+#include "ast/ast.h"
+#include "func/func.h"
 
 // Forward declaration
 FuncMap FuncRegistry::map;
