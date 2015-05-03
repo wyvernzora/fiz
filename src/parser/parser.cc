@@ -14,6 +14,8 @@
 
 #include "fiz/fiz.h"
 #include "func/func.h"
+#include "func/user.h"
+#include "func/registry.h"
 #include "parser/parser.h"
 
 

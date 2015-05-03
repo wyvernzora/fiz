@@ -1,4 +1,5 @@
 #include "var.h"
+#include "func/user.h"
 
 // ========================================================================= //
 // Variable: an identifier that refers to an integer value.                  //

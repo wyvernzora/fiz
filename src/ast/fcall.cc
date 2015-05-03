@@ -1,4 +1,5 @@
 #include "fcall.h"
+#include "func/registry.h"
 
 // ========================================================================= //
 // Function Call: represents a function call with its arguments.             //

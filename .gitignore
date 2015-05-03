@@ -1,5 +1,7 @@
 ./fiz
 ./libfiz.a
+flip
+!flip.*
 !fiz.*
 !Makefile
 *.o
@@ -8,3 +10,4 @@ lex.*
 node_modules
 obj
 tmp
+.deps

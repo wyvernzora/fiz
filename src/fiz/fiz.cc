@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "parser/parser.h"
 #include "func/func.h"
+#include "func/registry.h"
 #include "fiz/fiz.h"
 
 // Forward declarations

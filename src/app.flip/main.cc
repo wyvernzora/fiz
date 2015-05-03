@@ -14,6 +14,7 @@
 
 #include "fiz/fiz.h"
 #include "func/func.h"
+#include "func/registry.h"
 #include "parser/parser.h"
 
 void prompt(void);
