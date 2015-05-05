@@ -1,4 +1,5 @@
 #include "env.h"
+#include "num.h"
 
 
 // ========================================================================= //
@@ -30,4 +31,6 @@ void EnvarNode::resolve(Func *fn) {
 }
 
 // Evaluate: return the value of the argument.
-int  EnvarNode::eval(int *env) { return value; }
+AstNode* EnvarNode::eval(AstNode *env[]) {
+  return new NumNode(value);
+}

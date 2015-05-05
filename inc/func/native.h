@@ -14,7 +14,7 @@ public:
   NativeFunc(const char*, int,         // Constructor. Takes a name, number of
              BuiltInFunc);             // arguments and a pointer to handler
 
-  int call(NodeList*, int*);           // Calls the function
+  AstNode* call(NodeList*, AstNode**); // Calls the function
 };
 
 #endif

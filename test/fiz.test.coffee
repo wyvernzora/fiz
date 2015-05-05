@@ -6,7 +6,7 @@ exec = require('child_process').exec
 util = require 'util'
 
 # Test target
-target = './fiz'
+target = './flip'
 genericErrors = yes
 
 # Convenience function for testing

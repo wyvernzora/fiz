@@ -25,17 +25,17 @@ UserFunc::~UserFunc() {
 
 // Call: creates a context from arguments and evaluates the function body AST.
 // Takes a list of AST nodes as arguments, and the parent context.
-int UserFunc::call(NodeList *args, int *context) {
+AstNode* UserFunc::call(NodeList *args, AstNode *context[]) {
   // Check the number of arguments
   int argc  = args -> size();
   if (argc != this -> argc) { throw FIZ_ARGNUM; }
   // Evaluate all arguments
-  int *params = new int[argc];
+  AstNode **params = new AstNode*[argc];
   for (int i = 0; i < argc; i++) {
     params[i] = args -> at(i) -> eval(context);
   }
   // Evaluate the function body AST
-  int result = body -> eval(params);
+  AstNode *result = body -> eval(params);
   delete params;
   return result;
 }

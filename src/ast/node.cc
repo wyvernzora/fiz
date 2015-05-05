@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include "node.h"
+
+#define INVALID_PRINT "Invalid invocation of AstNode::print()\n"
 
 // ========================================================================= //
 // Abstract base class for all AST nodes.                                    //
@@ -8,4 +11,7 @@
 void AstNode::resolve(Func *fn)   { }
 
 // Evaluate: no-op.
-int  AstNode::eval(int *env)      { return 0; }
+AstNode* AstNode::eval(AstNode *env[])  { return NULL; }
+
+// Print: invalid.
+void AstNode::print(int fd)       { dprintf(fd, INVALID_PRINT); }

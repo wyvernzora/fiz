@@ -18,9 +18,10 @@ class Func;
 // ------------------------------------------------------------------------- //
 class AstNode {
 public:
-  virtual void resolve(Func*);         // Resolves the given node
-  virtual int  eval(int*);             // Evaluates the given node and returns
+  virtual void     resolve(Func*);     // Resolves the given node
+  virtual AstNode* eval(AstNode**);    // Evaluates the given node and returns
                                        // the result.
+  virtual void     print(int);         // Prints the node value to fd.
 };
 
 #endif

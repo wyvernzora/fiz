@@ -12,8 +12,10 @@ public:
 
   NumNode(int);                        // Constructor.
 
-  void resolve(Func*);                 // No-op for this class.
-  int  eval(int*);                     // Returns the value of the number node.
+  void     resolve(Func*);             // No-op for this class.
+  AstNode* eval(AstNode**);            // Returns the value of the number node.
+
+  void     print(int);
 };
 
 #endif

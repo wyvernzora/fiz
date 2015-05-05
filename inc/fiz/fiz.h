@@ -12,6 +12,10 @@
 #define FIZ_H_
 
 #include <deque>
+#include "ast/node.h"
+
+
+class AstNode;
 
 // ------------------------------------------------------------------------- //
 // FIZ error struct.                                                         //
@@ -48,6 +52,7 @@ typedef struct FIZ_ERR {
 #define FIZ_UNDEF_VAR        FIZ_ERR(907, "Variable is not defined.")
 #define FIZ_PIPE_FAIL        FIZ_ERR(908, "Pipe creation failed.")
 #define FIZ_BAD_ENVAR        FIZ_ERR(909, "Environment variable value not supported.")
+#define FIZ_BAD_TYPE         FIZ_ERR(910, "Bad argument type.")
 
 
 // ------------------------------------------------------------------------- //
@@ -61,9 +66,9 @@ typedef void (*PromptHandler)(void);
 class Fiz {
 private:
   static bool            _init;        // Indicates whether FIZ is initialized.
-  static std::deque<int> _output;      // Output buffer. Sort of.
+  static std::deque<AstNode*> _output; // Output buffer. Sort of.
 
-  static void  output(int);            // Internal output function.
+  static void  output(AstNode*);       // Internal output function.
 
 public:
 

@@ -11,4 +11,9 @@ NumNode::NumNode(int value)  { this -> value = value; }
 void NumNode::resolve(Func *fn)   { }
 
 // Evaluate: returns the value.
-int  NumNode::eval(int* env)      { return value; }
+AstNode* NumNode::eval(AstNode *env[])  { 
+  return this;
+}
+
+
+void NumNode::print(int fd) { dprintf(fd, "%d\n", this -> value); }

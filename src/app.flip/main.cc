@@ -28,7 +28,10 @@ void prompt() { printf("\x1B[1;36mfiz> \x1B[0m"); }
 // ------------------------------------------------------------------------- //
 // Outputs the result of a signle FIZ statement.                             //
 // ------------------------------------------------------------------------- //
-void output(int i) { printf("%d\n", i); }
+void output(AstNode *i) {
+  //printf("%d\n", i);
+  i -> print(1);
+}
 
 // ------------------------------------------------------------------------- //
 // Main program entry point (only when compiled as standalone executable).   //

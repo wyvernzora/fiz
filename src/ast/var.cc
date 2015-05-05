@@ -1,4 +1,5 @@
 #include "var.h"
+#include "num.h"
 #include "func/user.h"
 
 // ========================================================================= //
@@ -36,4 +37,6 @@ void VariableNode::resolve(Func *fn) {
 }
 
 // Evaluate: return the corresponding value from function argument list.
-int  VariableNode::eval(int *env) { return env[index]; }
+AstNode* VariableNode::eval(AstNode *env[]) {
+  return env[index];
+}

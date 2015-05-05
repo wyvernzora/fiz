@@ -61,6 +61,10 @@ int loading;
 
 ")"                           { return CP; }
 
+"["                           { return OSP; }
+
+"]"                           { return CSP; }
+
 0|[1-9][0-9]*                 {
                                 fizlval.num_val = atoi(fiztext);
                               	return NUM;

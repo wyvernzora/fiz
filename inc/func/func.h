@@ -22,7 +22,7 @@ typedef std::deque<char*>    IdList;
 // ------------------------------------------------------------------------- //
 // Shorthand for builtin function handler.                                   //
 // ------------------------------------------------------------------------- //
-typedef int (*BuiltInFunc)(NodeList*, int*);
+typedef AstNode* (*BuiltInFunc)(NodeList*, AstNode**);
 
 // ------------------------------------------------------------------------- //
 // Base class for function definitions.                                      //
@@ -33,7 +33,7 @@ public:
   int               argc;              // Number of arguments
   char             *name;              // Name of the function
 
-  virtual int call(NodeList*, int*);   // Calls the function and returns result
+  virtual AstNode* call(NodeList*, AstNode**);   // Calls the function
 };
 
 #endif

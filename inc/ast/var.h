@@ -14,8 +14,8 @@ public:
   VariableNode(char*);                 // Constructor.
   ~VariableNode();                     // Destructor.
 
-  void resolve(Func*);                 // Finds the index of variable.
-  int  eval(int*);                     // Fetches the value of the variable.
+  void     resolve(Func*);             // Finds the index of variable.
+  AstNode* eval(AstNode**);            // Fetches the value of the variable.
 };
 
 #endif

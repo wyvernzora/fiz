@@ -14,7 +14,7 @@ public:
   UserFunc(char*, IdList*, AstNode*);  // Constructor
   ~UserFunc();                         // Destructor
 
-  virtual int call(NodeList*, int*);   // Calls the function
+  virtual AstNode* call(NodeList*, AstNode**);   // Calls the function
 };
 
 #endif

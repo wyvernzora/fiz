@@ -14,12 +14,14 @@
  #include "ast/fcall.h"
  #include "ast/num.h"
  #include "ast/var.h"
- 
+
  #include "parser/parser.h"
 %}
 
 %token OP
 %token CP
+%token OSP
+%token CSP
 %token DEF
 
 %token <str_val>   ID
@@ -52,6 +54,7 @@ idlist:
 
 expr:
   OP ID exprs CP                  { $$ = new FcallNode($2, $3);             } |
+  OSP exprs CSP                   { printf("List node detected!"); exit(0); } |
   ID                              { $$ = new VariableNode($1);              } |
   XID                             { $$ = new EnvarNode($1);                 } |
   NUM                             { $$ = new NumNode($1);                   } ;

@@ -15,8 +15,8 @@ public:
   FcallNode(char*, NodeList*);         // Constructor.
   ~FcallNode();                        // Destructor.
 
-  void resolve(Func*);                 // Resolves all argument nodes.
-  int  eval(int*);                     // Evaluates the function and returns
+  void     resolve(Func*);             // Resolves all argument nodes.
+  AstNode* eval(AstNode**);            // Evaluates the function and returns
                                        // result of evaluation.
 };
 

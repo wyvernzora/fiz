@@ -22,7 +22,7 @@ extern FILE *fizin;
 // Shorthands for commonly used long type names.                             //
 // ------------------------------------------------------------------------- //
 typedef void (*PromptHandler)(void);
-typedef void (*OutputHandler)(int);
+typedef void (*OutputHandler)(AstNode*);
 
 // ------------------------------------------------------------------------- //
 // Called to start the YACC parsing process.                                 //
@@ -45,7 +45,7 @@ private:
   ST PromptHandler _prompt;                    // Prompt handler.
   ST OutputHandler _output;                    // Output handler.
 
-  ST void  output(int);                        // Internal output handler.
+  ST void  output(AstNode*);                   // Internal output handler.
 
 public:
   ST void  setInput(int);                      // Sets the parser input.
@@ -56,7 +56,7 @@ public:
   ST void  setOutput(OutputHandler);           // Sets the output handler.
 
   ST void  define(char*, IdList*, AstNode*);   // Defines a function.
-  ST int   execute(AstNode*);                  // Executes a statement.
+  ST AstNode* execute(AstNode*);               // Executes a statement.
 
   ST IdList*   id_list(char*, IdList*);        // Builds an ID list.
   ST NodeList* expr_list(AstNode*, NodeList*); // Builds an AST node list.

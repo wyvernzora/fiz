@@ -16,8 +16,8 @@
 #include "fiz/fiz.h"
 
 // Forward declarations
-bool            Fiz::_init;
-std::deque<int> Fiz::_output;
+bool                 Fiz::_init;
+std::deque<AstNode*> Fiz::_output;
 
 // ------------------------------------------------------------------------- //
 // Constructor. Creates a new Fiz interpreter wrapper instance.              //
@@ -75,7 +75,7 @@ int Fiz::eval(const char *script, int count) {
 int Fiz::read(int *buffer, int count) {
   int c = 0;
   while (!_output.empty() && c++ < count) {
-    *buffer++ = _output.front();
+    //*buffer++ = _output.front();
     _output.pop_front();
   }
   return c;
@@ -84,6 +84,6 @@ int Fiz::read(int *buffer, int count) {
 // ------------------------------------------------------------------------- //
 // PRIVATE: Internal output function.                                        //
 // ------------------------------------------------------------------------- //
-void Fiz::output(int i) {
+void Fiz::output(AstNode *i) {
   _output.push_back(i);
 }

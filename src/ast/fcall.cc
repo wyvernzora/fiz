@@ -33,7 +33,7 @@ void FcallNode::resolve(Func *fn) {
 }
 
 // Evaluate: find the function and call it.
-int  FcallNode::eval(int *env) {
+AstNode* FcallNode::eval(AstNode *env[]) {
   // (Lazy) Find the function
   if (!func) { func = FuncRegistry::find(name); }
   // Check for errors

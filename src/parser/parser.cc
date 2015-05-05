@@ -35,7 +35,7 @@ void Parser::prompt() {
   if (isatty(fileno(fizin)) && Parser::_prompt) { (*Parser::_prompt)(); }
 }
 
-void Parser::output(int i) {
+void Parser::output(AstNode *i) {
   if (Parser::_output) { (*Parser::_output)(i); }
 }
 
@@ -73,9 +73,9 @@ void Parser::define(char *name, IdList *args, AstNode *body) {
 // ------------------------------------------------------------------------- //
 // Execute a FIZ statement.                                                  //
 // ------------------------------------------------------------------------- //
-int Parser::execute(AstNode *expr) {
+AstNode* Parser::execute(AstNode *expr) {
   expr -> resolve(NULL);
-  int i = expr -> eval(NULL);
+  AstNode *i = expr -> eval(NULL);
   delete expr;
 
   Parser::output(i);

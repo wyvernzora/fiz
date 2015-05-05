@@ -12,6 +12,6 @@ NativeFunc::NativeFunc(const char *name, int argc, BuiltInFunc native) {
 }
 
 // Call: passes arguments to the native handler.
-int NativeFunc::call(NodeList *args, int *env) {
+AstNode* NativeFunc::call(NodeList *args, AstNode *env[]) {
   return (*native)(args, env);
 }

@@ -20,4 +20,4 @@
 // ========================================================================= //
 
 // Call: no-op.
-int Func::call(NodeList *args, int *context) { return 0; }
+AstNode* Func::call(NodeList *args, AstNode *context[]) { return 0; }

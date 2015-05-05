@@ -14,8 +14,8 @@ public:
   EnvarNode(char*);                    // Constructor.
   ~EnvarNode();                        // Destructor.
 
-  void resolve(Func*);                 // Resolves variable to its value.
-  int  eval(int*);                     // Returns the value.
+  void     resolve(Func*);             // Resolves variable to its value.
+  AstNode* eval(AstNode**);            // Returns the value.
 
 };
 
