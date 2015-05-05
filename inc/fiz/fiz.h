@@ -54,6 +54,7 @@ typedef struct FIZ_ERR {
 #define FIZ_BAD_ENVAR        FIZ_ERR(909, "Environment variable value not supported.")
 #define FIZ_BAD_TYPE         FIZ_ERR(910, "Bad argument type.")
 #define FIZ_BAD_PRINT        FIZ_ERR(911, "Bad print invocation.")
+#define FIZ_EMPTY_LIST       FIZ_ERR(912, "Attempt to index empty list.")
 
 // ------------------------------------------------------------------------- //
 // FIZ Interactive Prompt Handler.                                           //

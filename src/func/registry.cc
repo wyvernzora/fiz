@@ -14,6 +14,11 @@ void FuncRegistry::init() {
   reg(new NativeFunc("dec",  1, fiz_dec));
   reg(new NativeFunc("ifz",  3, fiz_ifz));
   reg(new NativeFunc("halt", 0, fiz_hlt));
+
+  reg(new NativeFunc("list", 2, flip_list));
+  reg(new NativeFunc("head", 1, flip_head));
+  reg(new NativeFunc("tail", 1, flip_tail));
+  reg(new NativeFunc("ife",  3, flip_ife ));
 }
 
 // Registers the function: returns true if successful; false otherwise.
