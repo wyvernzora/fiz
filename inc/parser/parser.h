@@ -60,6 +60,8 @@ public:
 
   ST IdList*   id_list(char*, IdList*);        // Builds an ID list.
   ST NodeList* expr_list(AstNode*, NodeList*); // Builds an AST node list.
+
+  ST AstNode*  list_literal(char*);            // Builds a list out of literal
 };
 
 #endif

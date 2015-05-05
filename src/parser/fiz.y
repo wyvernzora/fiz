@@ -28,6 +28,7 @@
 %token <str_val>   ID
 %token <num_val>   NUM
 %token <str_val>   XID
+%token <str_val>   STR
 %type  <node_val>  expr
 %type  <node_list> exprs
 %type  <id_list>   idlist
@@ -58,7 +59,8 @@ expr:
   OSP exprs CSP                   { $$ = new ListNode($2);                  } |
   ID                              { $$ = new VariableNode($1);              } |
   XID                             { $$ = new EnvarNode($1);                 } |
-  NUM                             { $$ = new NumNode($1);                   } ;
+  NUM                             { $$ = new NumNode($1);                   } |
+  STR                             { $$ = Parser::list_literal($1);          } ;
 
 exprs:
   expr exprs                      { $$ = Parser::expr_list($1,   $2);       } |

@@ -21,8 +21,10 @@ int loading;
 %}
 
 %option noyywrap
-
 %x incl
+
+char                          ([^\"\t\n]|\\[^\"\n\t])
+
 %%
 
 "import"                      { BEGIN(incl); }
@@ -55,6 +57,11 @@ int loading;
 [_a-zA-Z][_a-zA-Z0-9]*        {
                                 fizlval.str_val = strdup(fiztext);
                                 return ID;
+                              }
+
+["]{char}*["]                 {
+                                fizlval.str_val = strndup(fiztext + 1, strlen(fiztext) - 2);
+                                return STR;
                               }
 
 "("                           { return OP; }

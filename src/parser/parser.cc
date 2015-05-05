@@ -20,6 +20,8 @@
 
 
 #include "ast/node.h"
+#include "ast/list.h"
+#include "ast/num.h"
 
 
 PromptHandler Parser::_prompt;
@@ -99,4 +101,13 @@ IdList* Parser::id_list(char *arg, IdList *list) {
   if (!list) { list = new IdList(); }
   if (arg)   { list -> push_front(arg); }
   return list;
+}
+
+
+AstNode* Parser::list_literal(char *str) {
+  NodeList *nodes = new NodeList();
+  while (*str) {
+    nodes -> push_back(new NumNode(*str++));
+  }
+  return new ListNode(nodes);
 }
