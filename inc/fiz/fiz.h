@@ -53,7 +53,7 @@ typedef struct FIZ_ERR {
 #define FIZ_PIPE_FAIL        FIZ_ERR(908, "Pipe creation failed.")
 #define FIZ_BAD_ENVAR        FIZ_ERR(909, "Environment variable value not supported.")
 #define FIZ_BAD_TYPE         FIZ_ERR(910, "Bad argument type.")
-
+#define FIZ_BAD_PRINT        FIZ_ERR(911, "Bad print invocation.")
 
 // ------------------------------------------------------------------------- //
 // FIZ Interactive Prompt Handler.                                           //

@@ -14,7 +14,9 @@ public:
   ~ListNode();                         // Destructor
 
   void resolve(Func*);                 // Resolves all argument nodes
-  void eval(AstNode**);                // Evaluates the expression
-}
+  AstNode* eval(AstNode**);            // Evaluates the expression
+
+  void print(int);
+};
 
 #endif
